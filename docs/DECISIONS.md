@@ -19,6 +19,8 @@ Only user-authorized decisions belong in the table. The initial brief authorizes
 
 | 2026-11-19 | Build Stage 5 dashboard using engine outcomes and cached rankings. | User requested continued work after Stage 4. |
 
+| 2026-11-19 | Replace Vite app tooling with Next.js App Router; retain Vite tooling for Vitest only. | User explicitly requested migration while preserving the existing application. Simulation remains client-side with no application backend. |
+
 ## Pending review — not approved decisions
 
 - Review Stage 5 and authorize Stage 6 separately from any model amendment.

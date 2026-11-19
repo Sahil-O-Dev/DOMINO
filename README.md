@@ -6,7 +6,7 @@ A fictional underground infrastructure failure simulator and emergency resource 
 
 ## Development setup
 
-Use Node.js **22.14.0** and npm **11.3.0** for a matching team environment. `.nvmrc` records the Node version for compatible version managers; on Windows, installing that version directly also works. No global Vite installation is needed.
+Use Node.js **22.14.0** and npm **11.3.0** for a matching team environment. `.nvmrc` records the Node version for compatible version managers; on Windows, installing that version directly also works. No global Next.js installation is needed.
 
 From the repository folder on macOS or Windows:
 
@@ -15,7 +15,7 @@ npm ci
 npm run dev
 ```
 
-Open the local URL printed by Vite. Stop the server with Ctrl+C. On a fresh clone, `npm ci` installs the exact dependencies in the committed lockfile; do not commit `node_modules`.
+Open the local URL printed by Next.js (normally http://localhost:3000). Stop the server with Ctrl+C. On a fresh clone, `npm ci` installs the exact dependencies in the committed lockfile; do not commit `node_modules`.
 
 ## Commands
 
@@ -25,8 +25,8 @@ Open the local URL printed by Vite. Stop the server with Ctrl+C. On a fresh clon
 | `npm test` | Run tests once |
 | `npm run test:watch` | Watch tests while developing |
 | `npm run typecheck` | Check strict TypeScript contracts |
-| `npm run build` | Type-check and produce the static site in `dist/` |
-| `npm run preview` | Preview an existing production build locally |
+| `npm run build` | Build and type-check the Next.js app in `.next/` |
+| `npm run preview` | Serve an existing production build locally |
 
 Dependencies require internet for installation. After site assets load, planned simulation functionality will run locally without external APIs. There is no backend or database.
 
@@ -41,3 +41,9 @@ The implementation uses the fictional equations in SPEC. Integration validation 
 Read [the specification](docs/SPEC.md), [stages](docs/STAGES.md), [test plan](docs/TESTS.md), [project architecture](docs/PROJECT.md), then [current progress](docs/PROGRESS.md). Follow [development instructions](AGENTS.md).
 
 Agree on shared types before both developers build against them. Pull the latest changes, work on a task branch, run checks, and request review before merging. Update progress with related work. Equations stay unchanged unless explicitly approved and recorded in [DECISIONS](docs/DECISIONS.md).
+
+## Next.js setup
+
+The app now uses Next.js App Router. `src/app/layout.tsx` supplies metadata and global CSS, while `src/app/page.tsx` renders the existing client dashboard. Domain calculations remain pure TypeScript. No API routes, authentication or database have been added. Vite and its React plugin remain development dependencies solely for Vitest.
+
+After pulling this migration, stop the old Vite server, run `npm ci`, then `npm run dev`. Use port 3000 instead of 5173. For a production preview, run `npm run build` followed by `npm start`.

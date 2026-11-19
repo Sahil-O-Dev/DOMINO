@@ -4,6 +4,10 @@ Last updated: November 19, 2026 (America/New_York).
 
 This file answers: where are we, what changed, who owns the next task, and what needs a decision? Keep the current snapshot short. Equations live in [SPEC.md](SPEC.md), architecture in [PROJECT.md](PROJECT.md), approved decisions in [DECISIONS.md](DECISIONS.md), and acceptance criteria in [STAGES.md](STAGES.md).
 
+## Migration update — November 19, 2026
+
+User authorized Next.js reconfiguration. App Router page/layout and client dashboard are in place; Vite application entry files were removed and Vitest configuration retained separately. All 36 tests and the Next.js production build passed, including TypeScript validation. No equations changed. Teammate must run `npm ci` after receiving this change and use port 3000. Migration is local, not committed or pushed. Browser interactions and Windows checks remain pending.
+
 ## Current snapshot
 
 - Active phase: Stage 5 dashboard implemented locally; integration validation remains before final acceptance.

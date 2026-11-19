@@ -16,7 +16,7 @@ Build a polished emergency command center where a viewer can trigger a geotherma
 
 ## Architecture
 
-Entirely client-side: React + strict TypeScript + Vite; Recharts for charts; Vitest for tests; CSS or lightweight styling for a dark dashboard. No backend, database, external AI API, LLM-generated explanations, or live data. After assets load, simulation must work without internet. Offline installation or guaranteed offline cold-start hosting is not an MVP promise.
+Entirely client-side: React + strict TypeScript + Next.js; Recharts for charts; Vitest for tests; CSS or lightweight styling for a dark dashboard. No backend, database, external AI API, LLM-generated explanations, or live data. After assets load, simulation must work without internet. Offline installation or guaranteed offline cold-start hosting is not an MVP promise.
 
 Proposed module boundaries for approval in Stage 1:
 
@@ -73,3 +73,7 @@ Use Node 22.14.0 and npm 11.3.0 as the team baseline, with a committed npm lockf
 ### Stage 5 dashboard
 
 App owns policy, selected hour, disaster state, draft/applied allocation, and lambda. Cached outcomes drive rankings; the selected trajectory drives cards, levels and Recharts data. Current-hour indicators and full-horizon harm are labeled separately. Zero-spend reference comparisons are explicit. Native controls provide keyboard affordances, with responsive CSS and horizontally scrollable comparison tables. Full interaction and responsive verification remains in integration.
+
+### Next.js migration
+
+App Router now owns the root page and layout. The dashboard is a client component; calculations, charts, and interactions remain browser-side after hydration. Next.js prerenders the initial page during builds. There are no API routes or database services. `vitest.config.ts` retains the Vite React plugin strictly for tests. Original stage descriptions referring to Vite record the previous foundation.

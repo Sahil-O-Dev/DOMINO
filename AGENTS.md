@@ -1,7 +1,7 @@
 # DOMINO development instructions
 
 DOMINO models cascading infrastructure failures and emergency allocation in a fictional underground district.
-Use React, strict TypeScript, Vite, Recharts, Vitest, and CSS or lightweight styling.
+Use React, strict TypeScript, Next.js, Recharts, Vitest, and CSS or lightweight styling.
 Keep simulation and optimization pure TypeScript, deterministic, and independent of React.
 Run entirely client-side; no backend, database, randomness, or external AI calls.
 The UI must never hardcode simulation results, chart curves, or favorable statistics.
@@ -17,3 +17,13 @@ Keep future features out of scope unless approved; consult `docs/PROJECT.md`.
 After the required reading order, read `docs/PROGRESS.md` for current status and handoff.
 Update PROGRESS after meaningful work or handoff with actual checks, next actions, and owners.
 Keep current architecture in PROJECT and approved decision history in DECISIONS; link rather than duplicate.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

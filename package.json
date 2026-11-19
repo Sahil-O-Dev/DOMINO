@@ -9,14 +9,16 @@
   },
   "packageManager": "npm@11.3.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "next dev",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "npm run typecheck && vite build",
-    "preview": "vite preview"
+    "build": "next build",
+    "preview": "next start",
+    "start": "next start"
   },
   "dependencies": {
+    "next": "16.4.6",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "recharts": "3.11.0"
