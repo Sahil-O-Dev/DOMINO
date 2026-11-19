@@ -1,0 +1,15 @@
+# Two-minute demonstration
+
+Preparation: run the validated local production preview, verify cached simulations, select hour 0, and reset. Rehearse the exact current build. Use actual UI outputs for every quantity or comparison; no preliminary audit result is a substitute for engine output. Values in brackets below are live-data cues, not text to hardcode.
+
+| Time | Action | Narration |
+| --- | --- | --- |
+| 0:00–0:15 | Show the functioning five-level district at hour 0. | “In 2087, the Hollow depends on underground infrastructure. This district represents two million residents. DOMINO shows how one failure spreads and who bears the harm.” |
+| 0:15–0:30 | Select Directorate and trigger the geothermal failure. | “A geothermal failure removes 30% of available electricity. The Directorate favors upper levels. Watch delivered power across the district.” |
+| 0:30–0:50 | Scrub from hour 1 through hour 72; inspect heat, water, and unsafe populations. | “Power shortages weaken cooling and water recycling. These curves come from the same hourly simulation. A resident counts once per unsafe hour, even with several hazards.” Point out hazards actually present at the selected hour. |
+| 0:50–1:10 | Open the planner, show the 100-credit budget and three interventions; select its winner. | “Ventilation improves cooling, repairs improve recycling after a delay, and redistribution moves existing electricity. We evaluate every one of the 66 full-budget plans for this policy.” Show [computed H] and [computed D]. |
+| 1:10–1:30 | Compare winner, 40/30/30, and all-in plans. | “Spending evenly or choosing only one intervention can behave very differently. This plan changes modeled unsafe exposure by [computed difference] relative to [named comparator].” If tied or worse, say so; do not promise improvement against every comparator. |
+| 1:30–1:50 | Compare policies using the same allocation, then show their separate winners and move lambda from 0 to 2. | “Equity allocates power in proportion to essential demand. Here the plan and supply are identical, isolating the policy effect. We can also optimize each policy separately. This slider adds weight to deep-level harm.” If the winner stays fixed: “The same plan remains best under this model; changing the fairness weight does not require a different answer.” |
+| 1:50–2:00 | Return to human-impact comparison. | “Infrastructure decisions distribute risk as well as electricity. DOMINO makes those tradeoffs visible so limited resources can protect people. These are fictional exposure estimates, not real-world casualty forecasts.” |
+
+Do not spend the demonstration waiting for precomputation; run it before presenting or make its completion visible. Explanations must name the policy, allocation, horizon, and comparator where needed. If using a zero-spend reference, explicitly say it has no emergency spending; reserve equal-budget claims for 100-credit plans. Show score with H and D so the fairness term is understandable. Never stage a slider-driven recommendation change or substitute favorable chart curves.
