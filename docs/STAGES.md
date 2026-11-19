@@ -1,6 +1,6 @@
 # Implementation stages
 
-Current gate: documentation review. Do not start Stage 1 without approval. Work on one stage at a time; finish its checks, report actual results and limitations, and stop for approval before the next. A cut below is a proposed contingency, not permission to remove a required MVP feature silently. Never cut mathematical correctness, real simulation data, or conservation tests.
+Current gate: Stage 5 dashboard is implemented after user authorization. Integration checks remain in PROGRESS; Stage 6 requires approval. Work on one stage at a time; finish its checks, report actual results and limitations, and stop for approval before the next. A cut below is a proposed contingency, not permission to remove a required MVP feature silently. Never cut mathematical correctness, real simulation data, or conservation tests.
 
 ## Stage 1 — Project foundation and shared TypeScript types
 
@@ -12,10 +12,12 @@ Current gate: documentation review. Do not start Stage 1 without approval. Work 
 
 **Completion checklist:**
 
-- [ ] Resolve approval questions and record decisions.
-- [ ] Agree on interfaces and file ownership.
-- [ ] Verify installation and scripts on macOS and Windows.
-- [ ] Run checks, summarize results, request stage approval.
+- [x] Record Stage 1 authorization; optional model amendments remain pending for the next stage.
+- [x] Define shared domain interfaces; teammate review and named ownership remain pending.
+- [ ] Verify installation and scripts on both macOS and Windows (local macOS checks passed; Windows pending).
+- [x] Run local tests/type-check/build and browser smoke check; report results for stage review.
+
+Local verification: 2 Vitest tests passed in 2 files; strict TypeScript check and Vite build passed. The development server rendered the starter screen in a browser. See PROGRESS for handoff details. No simulation tests or model implementations exist yet.
 
 **Cuts if time is limited:** elaborate lint/format tooling, path aliases, reusable design systems, deployment automation. Keep strict typing and basic tests.
 
@@ -29,10 +31,10 @@ Current gate: documentation review. Do not start Stage 1 without approval. Work 
 
 **Completion checklist:**
 
-- [ ] Implement physics independent of React.
-- [ ] Verify boundary and first-step calculations independently.
-- [ ] Run tests, type-check, build; report results.
-- [ ] Reconcile preliminary audit discrepancies and stop for approval.
+- [x] Implement physics independent of React.
+- [x] Verify boundary and first-step calculations independently.
+- [x] Run tests, type-check, build; report results.
+- [x] Confirm untreated audit results and stop for approval.
 
 **Cuts if time is limited:** arbitrary scenario editors and generic dependency-graph abstractions; retain the fixed five-level model.
 
@@ -46,10 +48,10 @@ Current gate: documentation review. Do not start Stage 1 without approval. Work 
 
 **Completion checklist:**
 
-- [ ] Implement and test each intervention independently.
-- [ ] Enumerate and evaluate every plan for both policies.
-- [ ] Verify delay and budget boundaries.
-- [ ] Run checks, report findings, stop for approval.
+- [x] Implement and test each intervention independently.
+- [x] Enumerate and simulate every plan for both policies; score/metrics integration follows Stage 4.
+- [x] Verify delay and budget boundaries.
+- [x] Run checks, report findings, stop for approval.
 
 **Cuts if time is limited:** arbitrary budgets, arbitrary credit increments, workers, incremental search, persistence. Keep the specified grid.
 
@@ -63,10 +65,10 @@ Current gate: documentation review. Do not start Stage 1 without approval. Work 
 
 **Completion checklist:**
 
-- [ ] Audit units and denominators.
-- [ ] Confirm winners and ties independently.
-- [ ] Verify cache reuse on lambda changes.
-- [ ] Run checks, report limitations, stop for approval.
+- [x] Audit units and denominators.
+- [x] Confirm winners against the preliminary independent arithmetic audit; tie convention remains for review.
+- [x] Verify cache reuse on lambda changes.
+- [x] Run checks, report limitations, stop for approval.
 
 **Cuts if time is limited:** Pareto visualizations, sensitivity tools, extra fairness objectives, elaborate narrative generation. Keep H, D, score, and truthful explanations.
 

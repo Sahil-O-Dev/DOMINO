@@ -1,6 +1,6 @@
 # DOMINO simulation specification
 
-Status: proposed initial model, preserved verbatim in substance from the user brief; implementation awaits approval. This is the single source of truth for model equations and constants. Audit findings and proposed amendments at the end are **not** changes to the model. No scientific validation is claimed.
+Status: proposed initial model, preserved verbatim in substance from the user brief; Stage 1 foundation is authorized, and the original reference simulation is implemented under Stage 2 authorization. This is the single source of truth for model equations and constants. Audit findings and proposed amendments at the end are **not** changes to the model. No scientific validation is claimed.
 
 ## District and units
 

@@ -1,6 +1,6 @@
 # Required verification plan
 
-Status: plain-English requirements only. No test suite or application exists yet; no passing results are claimed. Use Vitest for pure TypeScript logic when implemented. Report actual commands, pass/fail counts, failures, and any checks not run at each stage. Use numerical tolerance for physical arithmetic comparisons; never round data before hazard evaluation.
+Status: this document defines required behavior for the full MVP. Stage 1 now has two passing smoke tests: React static rendering and shared domain type contracts (the latter also checked by TypeScript). The strict type-check and production build pass locally; no simulation, planner, fairness, or interactive dashboard tests are implemented yet. See PROGRESS for current verification and checks not run. Use numerical tolerance for physical arithmetic comparisons when the engine is implemented; never round data before hazard evaluation.
 
 ## Core engine
 
@@ -40,3 +40,15 @@ Status: plain-English requirements only. No test suite or application exists yet
 25. **Demo environment:** both developers install from the lockfile and run documented scripts on macOS/Windows. Type-check and production build pass. Test keyboard controls, readable chart legends and units, text hazard cues, reset/replay, and simulation with the network disconnected after initial asset load.
 
 Integration/UI checks may initially be manual and recorded honestly. Add a UI test dependency only when it materially verifies behavior and is approved within the active stage; do not add a large test stack merely for decorative elements.
+
+## Stage 2 verification
+
+23 tests in 3 files passed, including the original two foundation checks. Engine checks cover supply conservation/caps, both policies, invalid allocator inputs, determinism, snapshot independence, timing, normal water drift, bounded trajectories, hand-calculated first-hour T/Q, untreated audit exposure, and strict hazard boundaries. Build and TypeScript checks passed. Conservation tolerance is absolute 1e-9; no tolerance or rounding is applied to hazard classification. Intervention, planner, fairness, and interactive chart tests remain pending. Windows verification remains pending.
+
+## Stage 3 verification
+
+30 tests in 4 files passed; strict TypeScript and Vite build passed. New tests cover diminishing gains, invalid credits/budgets, exact repair onset with an independently calculated Q increment, cooling without additional power, normal-reference restrictions, independent full-grid enumeration, all 132 trajectories, power conservation and physical bounds across every evaluated hour, nested cache freezing, and reuse by identity. Fairness scoring and UI interaction checks remain pending.
+
+## Stage 4 verification
+
+36 tests in 5 files passed; TypeScript and production build passed. Added coverage includes overlapping hazards, exclusion of hour zero, hand-calculated deep denominator, zero/maximum exposure, malformed timeline rejection, score endpoints, synthetic crossover and ties, invalid lambda, all 132 outcome records, cached identity, actual winning allocations and same-plan policy comparisons. Dashboard behavior and Windows checks remain pending.

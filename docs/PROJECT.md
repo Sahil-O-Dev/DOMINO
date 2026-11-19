@@ -46,4 +46,30 @@ No illness progression, epidemiology, medical demand simulation, medicine reloca
 
 ## Current readiness
 
-Documentation is complete for review; application implementation is not authorized. SPEC records numerical limitations and unresolved choices. No automated application tests exist or have passed. The preliminary arithmetic review is evidence about the proposed model, not implementation validation.
+Use [PROGRESS.md](PROGRESS.md) for the current stage, ownership, verification evidence, and next actions. Keep this document's architecture current as approved changes land; preserve their rationale in [DECISIONS.md](DECISIONS.md).
+
+Stage 1 foundation is authorized and being verified. See PROGRESS for actual results and outstanding cross-platform checks. The reference simulation is implemented; interventions and planner await later stage approvals. SPEC records numerical limitations and unresolved model choices; no proposed model amendment has been adopted.
+
+### Foundation contracts
+
+`src/domain/types.ts` defines readonly, framework-independent contracts. `FiveLevels<T>` preserves the five-entry top-to-bottom shape; each entry also carries a level identifier. `SimulationInput` distinguishes a normal reference (no allocation) from the failure scenario (allocation required). Hazard flags preserve overlapping causes. Current unsafe population is separate from cumulative person-hours; deep harm is explicitly named in hours per resident. Ranked plans wrap cached outcomes rather than modifying physics results when lambda changes.
+
+The tuple does not prove matching level IDs at runtime. Number ranges, budgets, snapshot counts/order, and matching planner metadata also require runtime validation in later stages. No engine functions or duplicate configuration constants are introduced in Stage 1.
+
+Use Node 22.14.0 and npm 11.3.0 as the team baseline, with a committed npm lockfile and portable npm scripts. Build runs strict type-checking before Vite. Vitest uses a Node environment for future pure domain tests; the starter screen smoke test uses React's static renderer without a DOM test dependency. Browser interaction tests remain separate from this tooling smoke check.
+
+### Stage 2 implementation
+
+`src/domain/simulation.ts` contains fixed model constants, capped allocation, hazard classification, and `simulateReference(scenario, policy)`. It returns hourly snapshots without React imports. It intentionally exposes only normal and untreated-failure references at this stage. Paid interventions and the full SimulationResult metrics API follow in later stages. Constants and level definitions are frozen against mutation. Tests use absolute tolerance 1e-9 for conservation; strict hazard comparisons never use a tolerance. Model equations remain as specified.
+
+### Stage 3 implementation
+
+`interventions.ts` owns the specified effects, protective weights and allocation validation. `simulateTrajectory` accepts diagnostic zero/partial allocations up to 100 credits; normal scenarios reject paid interventions. `planner.ts` validates exact budgets and enumerates all 66 plans. Each `createPlannerCache()` instance lazily computes 132 trajectories once and freezes the nested outputs against accidental UI mutation. The cache is local to its instance and contains no lambda; a fresh instance is required if configurable scenarios are introduced. `CandidateTrajectory` is the intermediate contract until Stage 4 computes harm and integrates the existing PlanOutcome/RankedPlan contracts. No ranking or tie rule is implemented yet.
+
+### Stage 4 implementation
+
+`metrics.ts` calculates per-level and district harm from the union of hazard flags, excludes hour 0, and validates timeline sequence/level order. `ranking.ts` converts cached trajectories into frozen PlanOutcome records once; ranking uses those records without recomputing physics. `comparePolicies` explicitly returns same-plan and independently optimized results. Scores retain full precision. The proposed ascending V/R/X exact-tie convention is implemented for review, not claimed as a substantive improvement among tied plans.
+
+### Stage 5 dashboard
+
+App owns policy, selected hour, disaster state, draft/applied allocation, and lambda. Cached outcomes drive rankings; the selected trajectory drives cards, levels and Recharts data. Current-hour indicators and full-horizon harm are labeled separately. Zero-spend reference comparisons are explicit. Native controls provide keyboard affordances, with responsive CSS and horizontally scrollable comparison tables. Full interaction and responsive verification remains in integration.
