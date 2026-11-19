@@ -12,7 +12,7 @@ This file answers: where are we, what changed, who owns the next task, and what 
 - Chart markers and unsafe-population chart were added after that interaction smoke check and passed build/type-check; their visual check remains pending.
 - Outstanding integration checks: reset, keyboard/mobile layouts, invalid budget interaction, policy switching, slider/cache behavior in the browser, chart data mapping tests, Windows setup, and offline-after-load demonstration. No automated browser interaction suite exists yet.
 - V/R/X tie order remains an explicitly disclosed proposed convention for review.
-- Changes remain local and uncommitted; nothing has been pushed.
+- Application implementation pushed to `origin/main` as `a5cea9b`. Teammate can clone/pull and follow README setup.
 
 ## Stage status
 
