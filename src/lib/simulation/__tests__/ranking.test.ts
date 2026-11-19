@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { calculateHarm, fairnessScore } from './metrics';
-import { comparePolicies, createOutcomeCache, rankPlans } from './ranking';
-import { simulateReference } from './simulation';
-import type { PlanOutcome } from './types';
+import { calculateHarm, fairnessScore } from '../metrics';
+import { comparePolicies, createOutcomeCache, rankPlans } from '../ranking';
+import { simulateReference } from '../simulation';
+import type { PlanOutcome } from '../types';
 
 const cache = createOutcomeCache();
 describe('harm metrics', () => {

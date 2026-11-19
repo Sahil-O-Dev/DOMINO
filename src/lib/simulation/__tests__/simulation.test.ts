@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { allocatePower, BASELINE_WEIGHTS, classifyHazards, isUnsafe, LEVELS, simulateReference } from './simulation';
+import { allocatePower, BASELINE_WEIGHTS, classifyHazards, isUnsafe, LEVELS, simulateReference } from '../simulation';
 
 // Absolute tolerance for physical arithmetic only; hazards use strict comparisons.
 const tolerance = 1e-9;

@@ -6,7 +6,13 @@ This file answers: where are we, what changed, who owns the next task, and what 
 
 ## Migration update — November 19, 2026
 
-User authorized Next.js reconfiguration. App Router page/layout and client dashboard are in place; Vite application entry files were removed and Vitest configuration retained separately. All 36 tests and the Next.js production build passed, including TypeScript validation. No equations changed. Teammate must run `npm ci` after receiving this change and use port 3000. Migration is local, not committed or pushed. Browser interactions and Windows checks remain pending.
+User authorized Next.js reconfiguration. App Router page/layout and client dashboard are in place; Vite application entry files were removed and Vitest configuration retained separately. All 36 tests and the Next.js production build passed, including TypeScript validation. No equations changed. Teammate must run `npm ci` after receiving this change and use port 3000. Migration was committed and pushed as `423bf78`. Browser interactions and Windows checks remain pending.
+
+## Source organization update — November 19, 2026
+
+Reorganized source by responsibility: Next.js routes/global styles in `src/app`, dashboard UI in `src/components/dashboard`, pure engine modules in `src/lib/simulation`, and tests in each module's `__tests__` directory. Imports and documentation references were updated. Added a documentation index and root folder guide. Generated files are hidden in VS Code's explorer via workspace settings but remain on disk.
+
+Verification: all 36 existing tests passed in 5 files; Next.js production build and TypeScript checks passed. The earlier uncommitted redesign was rolled back before this task, so its additional conversion test is not part of this baseline. No model behavior changed. Organization changes remain local and uncommitted.
 
 ## Current snapshot
 
@@ -37,7 +43,7 @@ Use “In progress,” “Awaiting review,” “Complete,” or “Blocked” w
 | Action / question | Owner | Dependency |
 | --- | --- | --- |
 | Run `npm ci`, `npm test`, `npm run build`, and `npm run dev` on Windows | Teammate | Share foundation changes first |
-| Review shared contracts in `src/domain/types.ts` and agree on ownership | Both developers | Foundation review |
+| Review shared contracts in `src/lib/simulation/types.ts` and agree on ownership | Both developers | Foundation review |
 | Review SPEC limitations and pending interpretations | Both developers | Before simulation implementation |
 | Approve baseline equations, tie ordering, and reference conventions | Project owner | See DECISIONS pending review |
 | Review dashboard and authorize integration validation | Project owner | Simulation review; Windows checks remain pending |

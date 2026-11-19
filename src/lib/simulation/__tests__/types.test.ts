@@ -1,5 +1,5 @@
 import { expectTypeOf, it } from 'vitest';
-import type { FiveLevels, LevelId, PowerPolicy, SimulationInput } from './types';
+import type { FiveLevels, LevelId, PowerPolicy, SimulationInput } from '../types';
 
 it('keeps five-level and scenario contracts explicit for both developers', () => {
   expectTypeOf<FiveLevels<number>['length']>().toEqualTypeOf<5>();

@@ -21,6 +21,8 @@ Only user-authorized decisions belong in the table. The initial brief authorizes
 
 | 2026-11-19 | Replace Vite app tooling with Next.js App Router; retain Vite tooling for Vitest only. | User explicitly requested migration while preserving the existing application. Simulation remains client-side with no application backend. |
 
+| 2026-11-19 | Organize source into App Router files, dashboard components and a pure simulation library, with grouped module tests. | User requested a clearer file system; no behavior or model changes. |
+
 ## Pending review — not approved decisions
 
 - Review Stage 5 and authorize Stage 6 separately from any model amendment.

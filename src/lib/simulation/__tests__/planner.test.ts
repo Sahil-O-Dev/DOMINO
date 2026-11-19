@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { diminishingReturn, interventionEffects, validateAllocation, ZERO_ALLOCATION } from './interventions';
-import { createPlannerCache, enumerateAllocations } from './planner';
-import { simulateReference, simulateTrajectory, LEVELS } from './simulation';
+import { diminishingReturn, interventionEffects, validateAllocation, ZERO_ALLOCATION } from '../interventions';
+import { createPlannerCache, enumerateAllocations } from '../planner';
+import { simulateReference, simulateTrajectory, LEVELS } from '../simulation';
 
 describe('interventions', () => {
   it('starts at zero with decreasing gains', () => {

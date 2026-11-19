@@ -52,7 +52,7 @@ Stage 1 foundation is authorized and being verified. See PROGRESS for actual res
 
 ### Foundation contracts
 
-`src/domain/types.ts` defines readonly, framework-independent contracts. `FiveLevels<T>` preserves the five-entry top-to-bottom shape; each entry also carries a level identifier. `SimulationInput` distinguishes a normal reference (no allocation) from the failure scenario (allocation required). Hazard flags preserve overlapping causes. Current unsafe population is separate from cumulative person-hours; deep harm is explicitly named in hours per resident. Ranked plans wrap cached outcomes rather than modifying physics results when lambda changes.
+`src/lib/simulation/types.ts` defines readonly, framework-independent contracts. `FiveLevels<T>` preserves the five-entry top-to-bottom shape; each entry also carries a level identifier. `SimulationInput` distinguishes a normal reference (no allocation) from the failure scenario (allocation required). Hazard flags preserve overlapping causes. Current unsafe population is separate from cumulative person-hours; deep harm is explicitly named in hours per resident. Ranked plans wrap cached outcomes rather than modifying physics results when lambda changes.
 
 The tuple does not prove matching level IDs at runtime. Number ranges, budgets, snapshot counts/order, and matching planner metadata also require runtime validation in later stages. No engine functions or duplicate configuration constants are introduced in Stage 1.
 
@@ -60,7 +60,7 @@ Use Node 22.14.0 and npm 11.3.0 as the team baseline, with a committed npm lockf
 
 ### Stage 2 implementation
 
-`src/domain/simulation.ts` contains fixed model constants, capped allocation, hazard classification, and `simulateReference(scenario, policy)`. It returns hourly snapshots without React imports. It intentionally exposes only normal and untreated-failure references at this stage. Paid interventions and the full SimulationResult metrics API follow in later stages. Constants and level definitions are frozen against mutation. Tests use absolute tolerance 1e-9 for conservation; strict hazard comparisons never use a tolerance. Model equations remain as specified.
+`src/lib/simulation/simulation.ts` contains fixed model constants, capped allocation, hazard classification, and `simulateReference(scenario, policy)`. It returns hourly snapshots without React imports. It intentionally exposes only normal and untreated-failure references at this stage. Paid interventions and the full SimulationResult metrics API follow in later stages. Constants and level definitions are frozen against mutation. Tests use absolute tolerance 1e-9 for conservation; strict hazard comparisons never use a tolerance. Model equations remain as specified.
 
 ### Stage 3 implementation
 
@@ -77,3 +77,7 @@ App owns policy, selected hour, disaster state, draft/applied allocation, and la
 ### Next.js migration
 
 App Router now owns the root page and layout. The dashboard is a client component; calculations, charts, and interactions remain browser-side after hydration. Next.js prerenders the initial page during builds. There are no API routes or database services. `vitest.config.ts` retains the Vite React plugin strictly for tests. Original stage descriptions referring to Vite record the previous foundation.
+
+### Current source organization
+
+`src/app/` contains page/layout and global styles. `src/components/dashboard/Dashboard.tsx` owns the interactive UI. `src/lib/simulation/` contains the pure engine, planner, metrics, ranking, interventions and types. Each module group keeps tests in `__tests__/`. Root configuration stays in standard locations. See README for the folder map and docs/README.md for the documentation index.

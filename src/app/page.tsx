@@ -1,3 +1,3 @@
-import { App } from '../App';
+import { Dashboard } from '../components/dashboard/Dashboard';
 
-export default function Page() { return <App />; }
+export default function Page() { return <Dashboard />; }

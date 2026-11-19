@@ -1,10 +1,10 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { App } from './App';
+import { Dashboard } from '../Dashboard';
 
-describe('application foundation', () => {
+describe('dashboard', () => {
   it('renders the dashboard with computed initial state', () => {
-    const html = renderToStaticMarkup(<App />);
+    const html = renderToStaticMarkup(<Dashboard />);
     expect(html).toContain('<main');
     expect(html).toContain('id="district"');
     expect(html).toContain('DOMINO');

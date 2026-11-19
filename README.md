@@ -47,3 +47,28 @@ Agree on shared types before both developers build against them. Pull the latest
 The app now uses Next.js App Router. `src/app/layout.tsx` supplies metadata and global CSS, while `src/app/page.tsx` renders the existing client dashboard. Domain calculations remain pure TypeScript. No API routes, authentication or database have been added. Vite and its React plugin remain development dependencies solely for Vitest.
 
 After pulling this migration, stop the old Vite server, run `npm ci`, then `npm run dev`. Use port 3000 instead of 5173. For a production preview, run `npm run build` followed by `npm start`.
+
+## Where files belong
+
+```text
+src/
+  app/                          Next.js routes, root layout and global CSS
+  components/
+    dashboard/
+      Dashboard.tsx             Interactive dashboard UI
+      __tests__/                Dashboard rendering checks
+  lib/
+    simulation/                 Pure TypeScript model and optimization
+      simulation.ts             Hourly physics and power allocation
+      interventions.ts          Resource effects and budget validation
+      planner.ts                Allocation enumeration and trajectory cache
+      metrics.ts                Human-impact calculations
+      ranking.ts                Fairness rankings and policy comparisons
+      types.ts                  Shared data contracts
+      __tests__/                Engine and contract tests
+docs/                           Specification, plan, decisions and progress
+```
+
+Start frontend work in `src/components/dashboard/`; start model work in `src/lib/simulation/`. Keep routes in `src/app/` thin. Add tests in the corresponding `__tests__/` folder; Vitest discovers them automatically. See [the documentation index](docs/README.md) for planning files.
+
+Root files such as `package.json`, its lockfile, `tsconfig.json`, `vitest.config.ts`, and `next-env.d.ts` are tooling configuration. Keep them at the root. `.next/`, `node_modules/`, `dist/`, and TypeScript build caches are generated and ignored by Git; VS Code workspace settings hide them from the explorer. They remain on disk and can be shown by changing `.vscode/settings.json`.

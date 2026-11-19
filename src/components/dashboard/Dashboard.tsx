@@ -2,17 +2,17 @@
 
 import { useMemo, useState } from 'react';
 import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { createOutcomeCache, rankPlans, sameAllocation } from './domain/ranking';
-import { calculateHarm } from './domain/metrics';
-import { LEVELS, simulateReference, isUnsafe } from './domain/simulation';
-import type { PowerPolicy, ResourceAllocation } from './domain/types';
+import { createOutcomeCache, rankPlans, sameAllocation } from '../../lib/simulation/ranking';
+import { calculateHarm } from '../../lib/simulation/metrics';
+import { LEVELS, simulateReference, isUnsafe } from '../../lib/simulation/simulation';
+import type { PowerPolicy, ResourceAllocation } from '../../lib/simulation/types';
 
 const format = (value: number) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(value);
 const colors = ['#c1e69b', '#74c9b8', '#86b9ed', '#d8afe9', '#f5b57e'];
 const equalPlan: ResourceAllocation = { ventilationCredits: 40, recyclerCredits: 30, redistributionCredits: 30 };
 const planLabel = (p: ResourceAllocation) => `${p.ventilationCredits} / ${p.recyclerCredits} / ${p.redistributionCredits}`;
 
-export function App() {
+export function Dashboard() {
   const [cache] = useState(createOutcomeCache);
   const [failure, setFailure] = useState(false);
   const [policy, setPolicy] = useState<PowerPolicy>('directorate');
