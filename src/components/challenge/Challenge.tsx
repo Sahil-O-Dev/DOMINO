@@ -1,6 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { AttemptComparison } from './AttemptComparison';
+import { Replay } from './Replay';
 import { ResultCard } from './ResultCard';
 import { PlanSpace, allocationText } from './PlanSpace';
 import { safeHoursGini } from '../../lib/simulation/equity';
@@ -8,8 +10,8 @@ import { DistrictSection } from './DistrictSection';
 import { ArrowRight } from 'lucide-react';
 import { calculateHarm } from '../../lib/simulation/metrics';
 import { createOutcomeCache, rankPlans, sameAllocation } from '../../lib/simulation/ranking';
-import { LEVELS, MODEL, isUnsafe, simulateReference } from '../../lib/simulation/simulation';
-import type { HourlySnapshot, LevelId, PlanOutcome, PowerPolicy, RankedPlan, ResourceAllocation } from '../../lib/simulation/types';
+import { simulateReference } from '../../lib/simulation/simulation';
+import type { LevelId, PlanOutcome, PowerPolicy, RankedPlan, ResourceAllocation } from '../../lib/simulation/types';
 
 const initialPlan = { ventilationCredits: 40, recyclerCredits: 30, redistributionCredits: 30 };
 const fields = [
@@ -20,40 +22,8 @@ const fields = [
 const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format;
 const label = (plan: ResourceAllocation) => fields.map(([key]) => plan[key]).join(' / ');
 
-function Replay({ a, b, names, target }: {
-  a: readonly HourlySnapshot[]; b: readonly HourlySnapshot[];
-  names: [string, string]; target: LevelId;
-}) {
-  const [level, setLevel] = useState(target);
-  const [hour, setHour] = useState(MODEL.hours as number);
-  const index = level - 1;
-  const first = a.findIndex((snapshot, i) =>
-    isUnsafe(snapshot.levels[index]!.hazards) !== isUnsafe(b[i]!.levels[index]!.hazards));
-  return <div className="replay">
-    <label>Inspect district level <select value={level} onChange={e => setLevel(Number(e.target.value) as LevelId)}>
-      {LEVELS.map(l => <option key={l.id} value={l.id}>Level {l.id}</option>)}
-    </select></label>
-    <p className="footnote">Each strip shows all {MODEL.hours} hours. Hatched amber hours are unsafe.</p>
-    {[a, b].map((series, i) => <div key={i}>
-      <h3>{names[i]}</h3>
-      <div className="hour-strip" aria-hidden="true">{series.slice(1).map(s =>
-        <i key={s.hour} className={isUnsafe(s.levels[index]!.hazards) ? 'hazard' : ''} />)}</div>
-    </div>)}
-    <label>Inspect hour <strong>{hour}</strong><input type="range" min="0" max={MODEL.hours} value={hour} onChange={e => setHour(Number(e.target.value))}/></label>
-    {first >= 0 ? <button onClick={() => setHour(first)}>Jump to first safety difference · hour {first}</button>
-      : <p className="footnote">Both runs have the same safety status at every hour on this level.</p>}
-    <div className="reading-pair">{[a, b].map((series, i) => {
-      const reading = series[hour]!.levels[index]!;
-      const hazards = [reading.hazards.heat && 'heat', reading.hazards.water && 'water', reading.hazards.power && 'power'].filter(Boolean);
-      return <article key={i}><h3>{names[i]}</h3><strong>{hazards.length ? 'Unsafe · ' + hazards.join(', ') : 'Safe'}</strong>
-        <p>{number(reading.temperatureCelsius)} °C<br/>Water {number(reading.waterQuality)} / 100<br/>Power {number(reading.powerFraction * 100)}%</p></article>;
-    })}</div>
-    <p className="footnote">Modeled hazards begin above {MODEL.unsafeTemperature} °C, below water index {MODEL.unsafeWater}, or below {number(MODEL.unsafePower * 100)}% essential power. Readings are rounded for display.</p>
-  </div>;
-}
-
-function Debrief({ ranked, chosen, target, retry, outcomes }: {
-  outcomes: readonly PlanOutcome[]; ranked: readonly RankedPlan[]; chosen: RankedPlan; target: LevelId; retry: () => void;
+function Debrief({ ranked, chosen, previous, target, retry, outcomes }: {
+  previous: PlanOutcome | null; outcomes: readonly PlanOutcome[]; ranked: readonly RankedPlan[]; chosen: RankedPlan; target: LevelId; retry: () => void;
 }) {
   const [mode, setMode] = useState<'district' | 'optimizer'>('district');
   const [explored,setExplored] = useState(chosen.outcome);
@@ -76,6 +46,7 @@ function Debrief({ ranked, chosen, target, retry, outcomes }: {
       <p>{gain > 0 ? 'Your plan gave residents here '+gain+' more safe hours than the untreated outage.' : gain < 0 ? 'Residents here lost '+(-gain)+' safe hours compared with the untreated outage.' : 'Residents here had the same number of safe hours as in the untreated outage.'}
         {' '}{worsened.length > 0 ? 'Unsafe hours increased on '+worsened.map(l=>'level '+l.levelId).join(', ')+'.' :
         exposed.length > 0 ? 'Elsewhere, '+exposed.map(l=>'level '+l.levelId).join(', ')+' still experienced unsafe conditions.' : 'All other levels stayed safe.'}</p>
+      {previous && <AttemptComparison previous={previous} current={chosen.outcome} target={target}/>}
       <div className="actions"><button className="primary" onClick={retry}>Try another response</button><ResultCard plan={chosen} target={target}/></div>
     </section>
     <p className="eyebrow">Replay · {explored.policy} · {allocationText(explored)}</p>
@@ -113,11 +84,19 @@ export function Challenge() {
   const [policy, setPolicy] = useState<PowerPolicy>('equity');
   const [draft, setDraft] = useState<ResourceAllocation>(initialPlan);
   const [chosen, setChosen] = useState<RankedPlan | null>(null);
+  const [previous, setPrevious] = useState<PlanOutcome | null>(null);
   const [cache] = useState(createOutcomeCache);
   const [ranked, setRanked] = useState<readonly RankedPlan[]>([]);
   const total = fields.reduce((sum, [key]) => sum + draft[key], 0);
   const untreated = useMemo(() => simulateReference('geothermal-failure', policy), [policy]);
   const preview = useMemo(()=> total===100 ? cache.getOutcomes().find(o=>o.policy===policy && sameAllocation(o.allocation,draft)) : undefined,[cache,policy,draft,total]);
+  function revise() {
+    if (!chosen) return;
+    setPrevious(chosen.outcome);
+    setChosen(null);
+    requestAnimationFrame(() => document.getElementById('fund-response')?.scrollIntoView());
+  }
+
   function commit() {
     if (!target || total !== 100) return;
     const plans = rankPlans(cache.getOutcomes().filter(p => p.policy === policy), 0);
@@ -126,10 +105,11 @@ export function Challenge() {
     window.scrollTo(0, 0);
   }
   return <main id="main-content" className="shell challenge">
-    {chosen && target ? <Debrief outcomes={cache.getOutcomes()} ranked={ranked} chosen={chosen} target={target} retry={() => {setChosen(null);requestAnimationFrame(()=>document.getElementById('fund-response')?.scrollIntoView());}}/> : <>
+    {chosen && target ? <Debrief outcomes={cache.getOutcomes()} ranked={ranked} chosen={chosen} target={target} previous={previous} retry={revise}/> : <>
       <DistrictSection policy={policy} key={policy} untreated={untreated} target={target} represent={setTarget}/>
       <section className="panel funding" id="fund-response"><h2>Fund your response</h2>
           <p>Allocate 100 emergency credits for the district. {target ? 'You represent level ' + target + '.' : 'Choose the floor you represent in the section above.'}</p>
+          {previous && <p className="footnote">When you commit, you’ll see how this response compares with your last one.</p>}
           <label>Power policy <select value={policy} onChange={e => setPolicy(e.target.value as PowerPolicy)}><option value="equity">Equity · proportional to demand</option><option value="directorate">Directorate · upper levels first</option></select></label>
           {fields.map(([key, title, detail]) => <label key={key} className="budget-row"><span><strong>{title}</strong><small>{detail}</small></span>
             <select aria-label={title} value={draft[key]} onChange={e => setDraft({...draft, [key]: Number(e.target.value)})}>{Array.from({length:11}, (_, i) => <option key={i}>{i * 10}</option>)}</select></label>)}

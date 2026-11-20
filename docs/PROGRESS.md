@@ -1,6 +1,6 @@
 # Project progress and handoff
 
-Last updated: November 19, 2026 (America/New_York).
+Last updated: November 20, 2026 (America/New_York).
 
 This file answers: where are we, what changed, who owns the next task, and what needs a decision? Keep the current snapshot short. Equations live in [SPEC.md](SPEC.md), architecture in [PROJECT.md](PROJECT.md), approved decisions in [DECISIONS.md](DECISIONS.md), and acceptance criteria in [STAGES.md](STAGES.md).
 
@@ -15,6 +15,8 @@ Reorganized source by responsibility: Next.js routes/global styles in `src/app`,
 Verification: all 36 existing tests passed in 5 files; Next.js production build and TypeScript checks passed. The earlier uncommitted redesign was rolled back before this task, so its additional conversion test is not part of this baseline. No model behavior changed. Organization changes remain local and uncommitted.
 
 ## Current snapshot
+
+- The challenge debrief now compares each revision with the preceding submission in the same visit. Chrome at 1280 and 375 px verified three successive submissions, signed safe-hour changes across the five floors, and replay opening at the first changed safety status. In the Directorate run, shifting 10 credits from repairs to redistribution gained 59 safe hours on level 5 and cost level 3 five hours. All 56 tests, strict type checking, and the production build passed. Project owner to review the guest retry flow.
 
 - Verified live Gemini generation using the configured server key and a signed-in production Chrome walkthrough. The original model exceeded the 30-second deadline; the advisor now uses Flash-Lite with a short-answer budget and distinguishes timeout, quota and permission errors. 53 tests and type checking passed.
 
