@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { AdvisorChat } from "./AdvisorChat";
 import { Trajectories } from "./Trajectories";
 import { Activity, RotateCcw } from "lucide-react";
 import {
@@ -40,16 +41,6 @@ export function Dashboard() {
   const [lambda, setLambda] = useState(0);
   const [allocation, setAllocation] = useState<ResourceAllocation | null>(null);
   const [draft, setDraft] = useState(equalPlan);
-  // AI advisor state (additive; existing simulator behavior is unchanged).
-  const [aiResult, setAiResult] = useState<{
-    key: string;
-    explanation: string;
-  } | null>(null);
-  const [aiError, setAiError] = useState<{
-    key: string;
-    message: string;
-  } | null>(null);
-  const [aiLoadingKey, setAiLoadingKey] = useState<string | null>(null);
   const outcomes = useMemo(() => cache.getOutcomes(), [cache]);
   const ranked = useMemo(
     () =>
@@ -101,45 +92,6 @@ export function Dashboard() {
     setPolicy("directorate");
     setLambda(0);
     setDraft(equalPlan);
-  };
-  // Keep feedback tied to the exact scenario, policy, plan and fairness weight.
-  const aiKey = JSON.stringify({ failure, policy, allocation, lambda });
-  const aiLoading = aiLoadingKey === aiKey;
-  const analyzeWithAI = async () => {
-    if (!failure || !allocation || aiLoading) return;
-    const requestKey = aiKey;
-    setAiLoadingKey(requestKey);
-    setAiError(null);
-    setAiResult(null);
-    try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          policy,
-          allocation,
-          fairnessWeight: lambda,
-          before: untreatedHarm,
-          after: harm,
-          bestPlan: {
-            allocation: winner.outcome.allocation,
-            harm: winner.outcome.simulation.harm,
-          },
-        }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "AI analysis failed.");
-      if (typeof data.explanation !== "string")
-        throw new Error("Invalid AI response.");
-      setAiResult({ key: requestKey, explanation: data.explanation });
-    } catch (error) {
-      setAiError({
-        key: requestKey,
-        message: error instanceof Error ? error.message : "AI analysis failed.",
-      });
-    } finally {
-      setAiLoadingKey((current) => (current === requestKey ? null : current));
-    }
   };
   return (
     <main className="shell dashboard" id="main-content">
@@ -518,9 +470,13 @@ export function Dashboard() {
         
         <h2>DOMINO AI Advisor</h2>
         <p className="muted">
-          Compare an applied response plan with the untreated disaster, then ask
-          Gemini for an explanation and suggested next action. This sends the displayed plan and model results to Google.
+          Ask about the district or your response plan. Gemini receives your question, recent conversation, and simulation summary.
         </p>
+        <AdvisorChat key={JSON.stringify([failure,policy,allocation,lambda])} context={{
+          scenario: failure ? 'geothermal-failure' : 'normal', policy, allocation,
+          before: untreatedHarm, after: harm, fairnessWeight: lambda,
+          bestPlan: {allocation: winner.outcome.allocation, harm: winner.outcome.simulation.harm},
+        }}/>
         {failure && allocation ? (
           <>
             <p className="muted">
@@ -557,26 +513,11 @@ export function Dashboard() {
               Negative change means fewer unsafe person-hours; positive change
               means more. Values come from DOMINO's 72-hour simulation.
             </p>
-            <button
-              className="primary"
-              type="button"
-              disabled={aiLoading}
-              onClick={analyzeWithAI}
-            >
-              {aiLoading ? "Analyzing..." : "Analyze with DOMINO AI"}
-            </button>
-            {aiError?.key === aiKey && <p role="alert">{aiError.message}</p>}
-            {aiResult?.key === aiKey && (
-              <article className="panel" style={{ marginTop: 16 }}>
-                <h3>DOMINO's analysis and suggestions</h3>
-                <p style={{ whiteSpace: "pre-wrap" }}>{aiResult.explanation}</p>
-              </article>
-            )}
           </>
         ) : (
           <p className="muted">
             Trigger geothermal failure and apply a 100-credit allocation to see
-            the comparison and request AI feedback.
+            the before-and-after comparison. You can ask questions now.
           </p>
         )}
       </section>

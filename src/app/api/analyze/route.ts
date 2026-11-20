@@ -17,10 +17,21 @@ export async function POST(request:Request) {
   const apiKey=process.env.GEMINI_API_KEY;
   if(!apiKey)return Response.json({error:'The server needs a Gemini API key to generate an explanation.'},{status:503});
   let summary;
+  let question = 'Explain the selected scenario and suggest a next action.';
+  const conversation: {role:string;parts:{text:string}[]}[] = [];
   try {
-    const {policy,allocation,fairnessWeight,before,after,bestPlan}=await request.json();
+    const {policy,allocation,fairnessWeight,before,after,bestPlan,question:input,history=[],scenario='geothermal-failure'}=await request.json();
+    if (!['normal','geothermal-failure'].includes(scenario) || !Array.isArray(history) || history.length>6) throw new Error('Invalid chat');
+    if(input!==undefined){
+      if(typeof input!=='string'||!input.trim()||input.length>2000)throw new Error('Invalid question');
+      question=input.trim();
+    }
+    for(const turn of history){
+      if(typeof turn?.question!=='string'||turn.question.length>2000||typeof turn.answer!=='string'||turn.answer.length>12000)throw new Error('Invalid history');
+      conversation.push({role:'user',parts:[{text:turn.question}]},{role:'model',parts:[{text:turn.answer}]});
+    }
     if(!['directorate','equity'].includes(policy)||!Number.isFinite(fairnessWeight)||fairnessWeight<0||fairnessWeight>2)throw new Error('Invalid scenario');
-    summary={policy,allocation:allocationFields(allocation),fairnessWeight,before:harmFields(before),after:harmFields(after),
+    summary={scenario,policy,allocation:allocation===null?null:allocationFields(allocation),fairnessWeight,before:harmFields(before),after:harmFields(after),
       bestPlan:{allocation:allocationFields(bestPlan.allocation),harm:harmFields(bestPlan.harm)}};
   } catch {
     return Response.json({error:'Invalid simulation data.'},{status:400});
@@ -39,19 +50,10 @@ Here are the actual simulation results:
 
 ${JSON.stringify(summary)}
 
-Your tasks:
-
-1. BEFORE VS AFTER
-Compare unsafe person-hours before and after intervention.
-Explain whether the selected plan improved conditions.
-
-2. WHY THIS PLAN
-Explain why the allocation may be effective.
-Discuss benefits and trade-offs.
-
-3. SUGGESTED NEXT ACTION
-Recommend what the user should do next.
-Use the bestPlan data when suggesting a better allocation.
+Answer the user's latest question directly, using earlier turns for follow-ups.
+"before" describes the untreated outage. "after" describes the displayed scenario.
+A null allocation means no intervention is applied. The best plan is for the failure scenario.
+If data needed for an answer is missing, say so.
 
 IMPORTANT RULES:
 - Only use the simulation data provided.
@@ -65,7 +67,7 @@ IMPORTANT RULES:
   try {
     const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent',{
       method:'POST', headers:{'Content-Type':'application/json','x-goog-api-key':apiKey},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}]}),signal:AbortSignal.timeout(30000),cache:'no-store',
+      body:JSON.stringify({systemInstruction:{parts:[{text:prompt}]},contents:[...conversation,{role:'user',parts:[{text:question}]}]}),signal:AbortSignal.timeout(30000),cache:'no-store',
     });
     if(!response.ok)throw new Error('Provider unavailable');
     const result=await response.json();

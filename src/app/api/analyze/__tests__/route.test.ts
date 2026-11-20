@@ -20,3 +20,13 @@ it('returns generated explanation text from the provider',async()=>{
   vi.stubGlobal('fetch',vi.fn().mockResolvedValue(Response.json({candidates:[{content:{parts:[{text:'Example explanation.'}]}}]})));
   expect(await (await POST(request())).json()).toEqual({explanation:'Example explanation.'});
 });
+it('passes follow-up questions and bounded history to Gemini before a plan is applied',async()=>{
+  user.mockResolvedValue({name:'Tester'});vi.stubEnv('GEMINI_API_KEY','test-only');
+  const provider=vi.fn().mockResolvedValue(Response.json({candidates:[{content:{parts:[{text:'Answer'}]}}]}));
+  vi.stubGlobal('fetch',provider);
+  const payload={...await request().json(),scenario:'normal',allocation:null,question:'Why?',history:[{question:'What is harm?',answer:'Unsafe resident-hours.'}]};
+  const post=(data:unknown)=>POST(new Request('http://localhost/api/analyze',{method:'POST',body:JSON.stringify(data)}));
+  expect((await post(payload)).status).toBe(200);
+  expect(JSON.parse(provider.mock.calls[0]![1].body).contents.map((c:{parts:{text:string}[]})=>c.parts[0]!.text)).toEqual(['What is harm?','Unsafe resident-hours.','Why?']);
+  expect((await post({...payload,question:'  '})).status).toBe(400);
+});
