@@ -12,3 +12,6 @@ Thumbs.db
 
 .next/
 out/
+
+# Local account and session database
+.data/

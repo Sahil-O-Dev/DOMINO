@@ -16,13 +16,12 @@ Verification: all 36 existing tests passed in 5 files; Next.js production build 
 
 ## Current snapshot
 
-- Active phase: Stage 5 dashboard implemented locally; integration validation remains before final acceptance.
-- Implemented: five-level district, trigger/reset, policy selector, timeline, computed impact cards, temperature/water/power/unsafe-population charts, budget validation, top-five rankings, fairness control, comparator table and computed exposure explanation.
-- Verification: 36 tests passed; strict TypeScript and production build passed. Browser checks verified initial safe state, failure onset (84 power, 600,000 unsafe residents), untreated Directorate harm (72,700,000 person-hours), and applying the best plan (2,000,000 person-hours; safe at hour 72).
-- Chart markers and unsafe-population chart were added after that interaction smoke check and passed build/type-check; their visual check remains pending.
-- Outstanding integration checks: reset, keyboard/mobile layouts, invalid budget interaction, policy switching, slider/cache behavior in the browser, chart data mapping tests, Windows setup, and offline-after-load demonstration. No automated browser interaction suite exists yet.
-- V/R/X tie order remains an explicitly disclosed proposed convention for review.
-- Application implementation pushed to `origin/main` as `a5cea9b`. Teammate can clone/pull and follow README setup.
+- Stage 5 is ready for owner review on macOS. The DAYLIGHT landing page and account screens now lead into a protected DOMINO dashboard. See [PROJECT.md](PROJECT.md) for the account boundary and [README.md](../README.md) for local setup.
+- The dashboard now groups the four chart metrics in a keyboard-operable selector, labels the selected hour and full-horizon exposure, shows the applied draft and score, and resets the scenario, policy, fairness weight and credit controls together.
+- On Node 22.14.0 with npm 11.3.0, `npm test` passed **40 tests in 7 files**. `npm run typecheck` and `npm run build` passed. Node reports an experimental-feature notice for its built-in SQLite driver. Authentication tests cover persistence across database reopens, duplicate accounts, credential rejection, expiring sessions and sign-out. The chart adapter test checks all five levels at every hour.
+- A production Chrome walkthrough using a temporary account database passed registration, password confirmation, sign-in errors, sign-out, reload, and protected-route redirects. It verified the hour-1 Directorate reference, manual and ranked plan application, invalid budgets, keyboard timeline, policy and fairness controls, all four charts and offline reset/replay. Desktop at 1280 px and mobile at 360 px were inspected. The final walkthrough recorded zero browser errors or warnings.
+- Earlier checks exposed stale Next.js route types, a missing icon and transient chart overflow on mobile. The final type check regenerates route types, the app serves a local icon, and the chart fits its resized container.
+- Windows verification belongs to the teammate. Stage 6 and the proposed V/R/X tie order await project-owner review. Local branch: `codex/accounts-dashboard`.
 
 ## Stage status
 
@@ -33,7 +32,7 @@ Verification: all 36 existing tests passed in 5 files; Next.js production build 
 | 2. Simulation and tests | Awaiting review | Local implementation | 23 tests and type-check/build passed |
 | 3. Interventions and planner | Awaiting review | Local implementation | 30 tests, type-check and build passed; scoring follows Stage 4 |
 | 4. Human impact and fairness | Awaiting review | Local implementation | 36 tests, type-check/build passed; tie convention pending review |
-| 5. Dashboard and charts | Awaiting integration validation | Local implementation | Dashboard built; remaining UI checks listed above |
+| 5. Dashboard and charts | Awaiting review | Project owner | Local browser and build checks passed; teammate Windows check pending |
 | 6. Integration and demonstration | Not started | Both developers | Stage 5 acceptance and approval |
 
 Use “In progress,” “Awaiting review,” “Complete,” or “Blocked” when applicable. A completed implementation needs evidence from the required checks; a planned task is not completed work.
@@ -46,7 +45,7 @@ Use “In progress,” “Awaiting review,” “Complete,” or “Blocked” w
 | Review shared contracts in `src/lib/simulation/types.ts` and agree on ownership | Both developers | Foundation review |
 | Review SPEC limitations and pending interpretations | Both developers | Before simulation implementation |
 | Approve baseline equations, tie ordering, and reference conventions | Project owner | See DECISIONS pending review |
-| Review dashboard and authorize integration validation | Project owner | Simulation review; Windows checks remain pending |
+| Review Stage 5 and decide whether to authorize Stage 6 | Project owner | Simulation review; Windows checks remain pending |
 | Confirm teammate access and private repository visibility | Repository owner | GitHub settings |
 | Review submission rules and public repository contents/history | Both developers | Before publishing for submission |
 

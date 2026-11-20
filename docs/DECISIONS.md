@@ -23,6 +23,8 @@ Only user-authorized decisions belong in the table. The initial brief authorizes
 
 | 2026-11-19 | Organize source into App Router files, dashboard components and a pure simulation library, with grouped module tests. | User requested a clearer file system; no behavior or model changes. |
 
+| 2026-11-19 | Enable real accounts and lift the client-only constraint for authentication. | The project owner selected real accounts. The simulation and planner continue to run locally in the browser. See [PROJECT.md](PROJECT.md) for the implementation. |
+
 ## Pending review — not approved decisions
 
 - Review Stage 5 and authorize Stage 6 separately from any model amendment.

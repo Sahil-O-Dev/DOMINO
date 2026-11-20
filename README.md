@@ -28,7 +28,13 @@ Open the local URL printed by Next.js (normally http://localhost:3000). Stop the
 | `npm run build` | Build and type-check the Next.js app in `.next/` |
 | `npm run preview` | Serve an existing production build locally |
 
-Dependencies require internet for installation. After site assets load, planned simulation functionality will run locally without external APIs. There is no backend or database.
+## Accounts and local storage
+
+Open the local app and choose **Create account**. Registration signs you into the simulator. Use **Sign out** in the navigation to end the session. Returning users can sign in with the same email and password.
+
+Next.js creates `.data/accounts.sqlite` in the project directory on the first account operation. The directory is ignored by Git. Set `DOMINO_AUTH_DB` in `.env.local` to use a different file. Accounts persist across restarts of that server. Each teammate’s local install has its own account database. A shared deployment requires one Node server with a persistent writable volume and HTTPS. Node 22.14 prints an experimental-feature notice for its built-in SQLite driver.
+
+Authentication needs the server. Once the signed-in simulator has loaded, changing the policy, inspecting hours, and comparing allocations work offline.
 
 ## Current scope
 
@@ -44,7 +50,7 @@ Agree on shared types before both developers build against them. Pull the latest
 
 ## Next.js setup
 
-The app now uses Next.js App Router. `src/app/layout.tsx` supplies metadata and global CSS, while `src/app/page.tsx` renders the existing client dashboard. Domain calculations remain pure TypeScript. No API routes, authentication or database have been added. Vite and its React plugin remain development dependencies solely for Vitest.
+The app now uses Next.js App Router. `src/app/layout.tsx` supplies metadata and global CSS, while `src/app/page.tsx` renders the scenario introduction. Domain calculations remain pure TypeScript. The protected dashboard is served at `/domino`. Account handling lives in `src/lib/auth/`. Vite and its React plugin remain development dependencies solely for Vitest.
 
 After pulling this migration, stop the old Vite server, run `npm ci`, then `npm run dev`. Use port 3000 instead of 5173. For a production preview, run `npm run build` followed by `npm start`.
 

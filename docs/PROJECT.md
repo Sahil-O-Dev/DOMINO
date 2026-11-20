@@ -16,7 +16,7 @@ Build a polished emergency command center where a viewer can trigger a geotherma
 
 ## Architecture
 
-Entirely client-side: React + strict TypeScript + Next.js; Recharts for charts; Vitest for tests; CSS or lightweight styling for a dark dashboard. No backend, database, external AI API, LLM-generated explanations, or live data. After assets load, simulation must work without internet. Offline installation or guaranteed offline cold-start hosting is not an MVP promise.
+React, strict TypeScript, Next.js, Recharts, Vitest and local CSS power the dashboard. Next.js Server Actions handle registration, sign-in and sign-out. The server checks an expiring opaque session before rendering the simulator. A persistent SQLite file stores salted password hashes and session digests. Only accounts need the server. All simulation and optimization runs locally after hydration. After assets load, simulation must work without internet. Offline installation or guaranteed offline cold-start hosting is not an MVP promise.
 
 Proposed module boundaries for approval in Stage 1:
 
@@ -42,7 +42,7 @@ Use one agreed Node version and package manager, commit its lockfile, and docume
 
 ## Boundaries and future extensions
 
-No illness progression, epidemiology, medical demand simulation, medicine relocation, robustness/sensitivity features, ML predictions, live external data, backend, authentication, or complex database. Each requires approval. A future sensitivity feature must vary copies of selected coefficients without changing the baseline specification. No fabricated forecasts or favorable comparisons.
+No illness progression, epidemiology, medical demand simulation, medicine relocation, robustness/sensitivity features, ML predictions, live external data, or database-backed simulation. Each requires approval. A future sensitivity feature must vary copies of selected coefficients without changing the baseline specification. No fabricated forecasts or favorable comparisons.
 
 ## Current readiness
 
@@ -72,11 +72,11 @@ Use Node 22.14.0 and npm 11.3.0 as the team baseline, with a committed npm lockf
 
 ### Stage 5 dashboard
 
-App owns policy, selected hour, disaster state, draft/applied allocation, and lambda. Cached outcomes drive rankings; the selected trajectory drives cards, levels and Recharts data. Current-hour indicators and full-horizon harm are labeled separately. Zero-spend reference comparisons are explicit. Native controls provide keyboard affordances, with responsive CSS and horizontally scrollable comparison tables. Full interaction and responsive verification remains in integration.
+App owns policy, selected hour, disaster state, draft/applied allocation, and lambda. Cached outcomes drive rankings; the selected trajectory drives cards, levels and Recharts data. Current-hour indicators and full-horizon harm are labeled separately. Zero-spend reference comparisons are explicit. Native controls provide keyboard affordances, with responsive CSS and horizontally scrollable comparison tables. See PROGRESS for interaction and responsive verification.
 
 ### Next.js migration
 
-App Router now owns the root page and layout. The dashboard is a client component; calculations, charts, and interactions remain browser-side after hydration. Next.js prerenders the initial page during builds. There are no API routes or database services. `vitest.config.ts` retains the Vite React plugin strictly for tests. Original stage descriptions referring to Vite record the previous foundation.
+App Router now owns the root page and layout. The dashboard is a client component; calculations, charts, and interactions remain browser-side after hydration. Routes that read an account session render at request time. `vitest.config.ts` retains the Vite React plugin strictly for tests. Original stage descriptions referring to Vite record the previous foundation.
 
 ### Current source organization
 
