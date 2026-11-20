@@ -16,6 +16,8 @@ Verification: all 36 existing tests passed in 5 files; Next.js production build 
 
 ## Current snapshot
 
+- Added a second Handoff briefing and same-room role swap. Type checking, production build and 49 tests passed. Chrome verified both local modes, two-party readiness, second-round role reversal, restored roles after refresh, fresh reports and matching final debriefs in two independent browser sessions. Venue Wi-Fi and physical-phone rehearsal remain with the project owner.
+
 - Added The Handoff as a separate guest mode at `/handoff`, linked from the district opener. Solo and hot-seat briefings work on one device. Paired mode uses a six-character code. Local Chrome checks covered report delivery between separate browser contexts, resident refresh, hot-seat privacy, identical debriefs and 375 px layout. All 47 tests, strict type checking and production build passed. Project owner to rehearse on the venue network with a physical phone or use hot-seat. Windows verification remains with the teammate.
 
 - Fixed the opaque floor buttons that covered four floors of the cutaway. The guest flow now labels every floor’s safety, offers readings and charts on demand, and leads the debrief with the represented level’s outcome relative to the untreated outage. Chrome verified selecting all five floors at both 1280 px and 375 px, the first hazard, plan commitment, opening analyses and revising a plan. All 45 tests, strict type checking and production build passed. Project owner to review the simplified Stage 5 flow.

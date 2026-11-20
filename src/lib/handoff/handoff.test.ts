@@ -27,3 +27,28 @@ it('pairs one resident, keeps roles distinct and locks both views to the committ
   expect(rooms.read(resident).decision).toEqual(plan);
   expect(()=>rooms.send(resident,'heat')).toThrow();
 });
+
+it('opens Level 4 only after both posts are ready and rejects actions from the old round',()=>{
+  const rooms=createRegistry(), operator=rooms.create(), resident=rooms.join(operator.code);
+  expect(()=>rooms.readyForSecond(operator)).toThrow();
+  rooms.commit(operator,plan);
+  expect(rooms.readyForSecond(resident).round).toBe(1);
+  expect(rooms.readyForSecond(resident).ready).toEqual(['resident']);
+  const next=rooms.readyForSecond(operator);
+  expect(next).toMatchObject({round:2,reports:[],ready:[],decision:null});
+  expect(rooms.readyForSecond(operator)).toEqual(next);
+  expect(()=>rooms.commit(operator,plan,1)).toThrow();
+  expect(()=>rooms.commit(operator,plan,2)).toThrow();
+  expect(()=>rooms.send(resident,'heat',1)).toThrow();
+  expect(rooms.send(operator,'heat',2).reports).toEqual(['heat']);
+  expect(rooms.commit(resident,plan,2).decision).toEqual(plan);
+  expect(rooms.read(operator).round).toBe(2);
+});
+
+it('derives the second field report from Level 4 at hour 36',()=>{
+  const second=incident(2);
+  expect(second.actual).toEqual(second.run[36]!.levels[3]);
+  expect(second.official.water).toBe(Math.round(second.run[2]!.levels[3].waterQuality));
+  expect(second.actual.hazards).not.toEqual(incident(1).actual.hazards);
+  expect(report('power',second)).toContain('Level 4, hour 36');
+});

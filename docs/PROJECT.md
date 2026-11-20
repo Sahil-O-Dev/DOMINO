@@ -72,7 +72,7 @@ Use Node 22.14.0 and npm 11.3.0 as the team baseline, with a committed npm lockf
 
 ### The Handoff
 
-The optional field-operations mode presents a fixed Level 5 briefing from the untreated Directorate trajectory. Its rounded hour-1 official sample and current hour-12 resident reports are separate views of the same run. Players assess each threshold and select a budget. The reveal compares that assessment with the actual state, then evaluates a full-horizon counterfactual from hour 1. Solo resident dispatches use deterministic templates. Hot-seat uses a covered pass screen. Paired rooms synchronize reports and the committed decision on one Node process, expire after 30 minutes and end if the server restarts. Simulations still run on the client.
+The optional field-operations mode presents two briefings from the untreated Directorate trajectory. Level 5 compares a rounded hour-1 official sample with resident observations at hour 12. Level 4 compares hour 2 with hour 36. Paired participants can swap duties inside their original room once both confirm readiness. Each mutation checks the round and current duty. Players assess each threshold and select a budget. The reveal compares that assessment with the actual state, then evaluates a full-horizon counterfactual from hour 1. Solo resident dispatches use deterministic templates. Hot-seat uses a covered pass screen. Paired rooms synchronize reports and the committed decision on one Node process, expire after 30 minutes and end if the server restarts. Simulations still run on the client.
 
 ### Stage 5 dashboard
 
