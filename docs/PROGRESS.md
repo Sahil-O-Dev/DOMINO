@@ -16,6 +16,8 @@ Verification: all 36 existing tests passed in 5 files; Next.js production build 
 
 ## Current snapshot
 
+- Merged the teammate’s Gemini advisor into the signed-in dashboard with a discoverable guest entry and authenticated server-side REST integration. Missing credentials prevent live verification. Owner to set GEMINI_API_KEY in the local server environment. Local tests cover authorization, missing-key behavior and a mocked provider response.
+
 - Added a second Handoff briefing and same-room role swap. Type checking, production build and 49 tests passed. Chrome verified both local modes, two-party readiness, second-round role reversal, restored roles after refresh, fresh reports and matching final debriefs in two independent browser sessions. Venue Wi-Fi and physical-phone rehearsal remain with the project owner.
 
 - Added The Handoff as a separate guest mode at `/handoff`, linked from the district opener. Solo and hot-seat briefings work on one device. Paired mode uses a six-character code. Local Chrome checks covered report delivery between separate browser contexts, resident refresh, hot-seat privacy, identical debriefs and 375 px layout. All 47 tests, strict type checking and production build passed. Project owner to rehearse on the venue network with a physical phone or use hot-seat. Windows verification remains with the teammate.

@@ -76,6 +76,8 @@ The optional field-operations mode presents two briefings from the untreated Dir
 
 ### Stage 5 dashboard
 
+The dashboard’s optional advisor sends a validated numerical scenario summary through an authenticated Next.js route to Gemini. The key is server-only.
+
 The challenge renders per-hour physical overlays, an interactive exposure matrix, before/after split, modeled dependency and power-flow diagrams, selectable optimizer scatter and local PNG results. Population-weighted safe-hours Gini is a presentation metric independent of ranking. The optional 500-run ensemble uses a local seed and a sampled trajectory entry point that shares the baseline recurrence. It runs only when enabled. Results are summarized per level/hour and per pathway; baseline scores and replay use the deterministic cache. See SPEC for sampling and proxy definitions.
 
 The homepage and guest challenge render the interactive architectural section. Five selectable floor overlays use the selected snapshot for power shading and hazard labels. Playback pauses at the first unsafe snapshot. Funded and untreated runs share a single inspection hour and floor. The scenario introduction is at /brief and Inspect data opens the account-protected dashboard.

@@ -3,7 +3,7 @@
 DOMINO models cascading infrastructure failures and emergency allocation in a fictional underground district.
 Use React, strict TypeScript, Next.js, Recharts, Vitest, and CSS or lightweight styling.
 Keep simulation and optimization pure TypeScript, deterministic, and independent of React.
-Run the simulation entirely client-side with no randomness in the baseline or external AI calls. The approved account backend may use persistent SQLite storage and cryptographic randomness for authentication.
+Run the simulation entirely client-side with no randomness in the baseline or external AI calls in the simulation. The signed-in dashboard may call Gemini on demand to explain computed outcomes. The approved account backend may use persistent SQLite storage and cryptographic randomness for authentication.
 The UI must never hardcode simulation results, chart curves, or favorable statistics.
 Read in order: `docs/SPEC.md`, `docs/STAGES.md`, `docs/TESTS.md`, `docs/PROJECT.md`.
 Work on one development stage at a time; stop for user approval between stages.

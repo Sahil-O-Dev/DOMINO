@@ -82,3 +82,7 @@ Root files such as `package.json`, its lockfile, `tsconfig.json`, `vitest.config
 ## The Handoff
 
 Open `/handoff` for the Level 5 operator/resident briefing. After the reveal, both participants can choose **Ready to swap posts** to open a second Level 4 briefing with reversed duties and the same code. Solo and hot-seat users can also continue to Level 4. Solo and hot-seat modes need one browser. For a paired briefing, both devices must reach the same Node server. Open a room as operator, then open the same site's `/handoff` page on the resident's device and enter the six-character code. On a LAN, use the server's reachable LAN address on the phone. Rooms live for 30 minutes in server memory. A server restart clears them. If venue Wi-Fi isolates devices, use hot-seat on the laptop.
+
+## Gemini advisor
+
+Sign in, open the dashboard, and apply a 100-credit plan. Under **AI Advisor**, choose **Analyze with DOMINO AI**. Set `GEMINI_API_KEY` in the server environment or in the ignored `.env.local` file at the project root and restart Next.js. The server calls Gemini with the selected scenario summary. Simulation and rankings still work offline after loading.

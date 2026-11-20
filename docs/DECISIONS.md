@@ -27,6 +27,8 @@ Only user-authorized decisions belong in the table. The initial brief authorizes
 
 | 2026-11-19 | Add an opt-in illustrative uncertainty and health layer with 500 fixed-seed runs, the owner-specified distributions, a 12-hour respiratory lag and illustrative excess-exposure coefficients. | Owner authorized synthetic risk ranges separately from deterministic replay, optimizer and scores. See SPEC for interpretation. |
 
+| 2026-11-20 | Permit on-demand external Gemini explanations in the signed-in dashboard. | Owner approved AI for the advisor. Simulation and scoring remain deterministic. |
+
 ## Pending review — not approved decisions
 
 - Review Stage 5 and authorize Stage 6 separately from any model amendment.
