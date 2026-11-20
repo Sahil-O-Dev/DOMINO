@@ -1,3 +1,4 @@
+import { stripHour } from './strip-hour';
 import { PanelExplain } from '../PanelExplain';
 import { useMemo, useState } from 'react';
 import { illustrate } from '../../lib/simulation/illustrative';
@@ -31,10 +32,8 @@ function Ensemble({series,policy,allocation,floor,hour,inspect}:Props) {
     </svg><p>Hour {hour} · deterministic {safe[hour]} safe hours · ensemble P10–P90 {endpoints(row[hour]!)}. The shaded band contains the central 80% of sampled outcomes.</p>
     <h3>Hourly safety across {C.runs} runs</h3><p>Light cells are predominantly safe. Hatched cells span safe and unsafe within P10–P90. Dark cells are predominantly unsafe. The percentage at right follows the replay hour.</p>
     {results.cells.map((cells,i)=><div className="exposure-row" key={i}><span>L{i+1}</span>
-      <button className="safety-strip" aria-label={'Inspect uncertainty for level '+(i+1)} onClick={e=>{
-        const box=e.currentTarget.getBoundingClientRect();
-        inspect(LEVELS[i]!.id,e.detail?Math.max(1,Math.min(MODEL.hours,1+Math.floor((e.clientX-box.left)/box.width*MODEL.hours))):hour);
-      }}>{cells.slice(1).map((c,j)=><i key={j} data-band={c.probability>.9?'unsafe':c.probability>=.1?'mixed':'safe'} data-active={j+1===hour} title={'Hour '+(j+1)+' · '+(c.probability*100).toFixed(1)+'% unsafe'}/>)}</button>
+      <button className="safety-strip" aria-label={'Inspect uncertainty for level '+(i+1)} onClick={e => inspect(LEVELS[i]!.id, stripHour(e, hour))}>
+        {cells.slice(1).map((c,j)=><i key={j} data-hour={j+1} data-band={c.probability>.9?'unsafe':c.probability>=.1?'mixed':'safe'} data-active={j+1===hour} title={'Hour '+(j+1)+' · '+(c.probability*100).toFixed(1)+'% unsafe'}/>)}</button>
       <span>{(cells[hour]!.probability*100).toFixed(1)}% unsafe</span></div>)}
     <h3>Illustrative cases over {MODEL.hours} hours</h3>
     <label>Pathway <select value={path} onChange={e=>setPath(e.target.value as typeof path)}><option value="combined">Any modeled pathway</option><option value="heat">Heat stress</option><option value="water">Waterborne illness</option><option value="respiratory">Respiratory</option></select></label>

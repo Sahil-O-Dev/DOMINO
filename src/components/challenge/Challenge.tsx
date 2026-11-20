@@ -52,7 +52,7 @@ function Debrief({ ranked, chosen, previous, target, retry, outcomes }: {
       {previous && <AttemptComparison previous={previous} current={chosen.outcome} target={target}/>}
       <div className="actions"><button className="primary" onClick={retry}>Try another response</button><ResultCard plan={chosen} target={target}/></div>
     </section>
-    <p className="eyebrow">Replay · {explored.policy} · {allocationText(explored)}</p>
+    <p id="plan-replay" className="eyebrow">Replay · {explored.policy} · {allocationText(explored)}</p>
     <DistrictSection policy={explored.policy} allocation={explored.allocation} key={replayNumber} autoplay={replayNumber>0} funded={explored.simulation.snapshots} untreated={replayBaseline} target={target}/>
     <details className="investigate"><summary>Compare plans and district outcomes</summary>
       <div className="actions"><button aria-pressed={mode === 'district'} onClick={() => setMode('district')}>District impact</button>
@@ -111,7 +111,8 @@ export function Challenge() {
   }
   return <main id="main-content" className="shell challenge">
     {chosen && target ? <Debrief outcomes={cache.getOutcomes()} ranked={ranked} chosen={chosen} target={target} previous={previous} retry={revise}/> : <>
-      <DistrictSection policy={policy} key={policy} untreated={untreated} target={target} represent={setTarget}/>
+      <DistrictSection policy={policy} untreated={untreated} target={target} represent={setTarget}
+        funded={preview?.simulation.snapshots} allocation={draft}/>
       <section className="panel funding" id="fund-response"><h2>Fund your response</h2>
           <p>Allocate 100 emergency credits for the district. {target ? 'You represent level ' + target + '.' : 'Choose the floor you represent in the section above.'}</p>
           {previous && <p className="footnote">When you commit, you’ll see how this response compares with your last one.</p>}
@@ -119,7 +120,9 @@ export function Challenge() {
           <label>Power policy <select value={policy} onChange={e => setPolicy(e.target.value as PowerPolicy)}><option value="equity">Equity · proportional to demand</option><option value="directorate">Directorate · upper levels first</option></select></label>
           {fields.map(([key, title, detail]) => <label key={key} className="budget-row"><span><strong>{title}</strong><small>{detail}</small></span>
             <select aria-label={title} value={draft[key]} onChange={e => setDraft({...draft, [key]: Number(e.target.value)})}>{Array.from({length:11}, (_, i) => <option key={i}>{i * 10}</option>)}</select></label>)}
-          <p role="status">{total} / 100 credits · {!target ? 'Choose a level to represent.' : total !== 100 ? 'Allocate exactly 100 to continue.' : 'Ready to commit for level ' + target + '.'}</p>
+          <p role="status">{total} / 100 credits · {total !== 100 ? 'Allocate exactly 100 to preview your response.' : !target ? 'Choose a level to represent.' : 'Ready to commit for level ' + target + '.'}</p>
+          {preview && <p className="draft-replay-summary">Unsafe hours on each floor over the full run · {preview.simulation.harm.levels.map(l => 'L' + l.levelId + ' ' + l.unsafeHours + 'h').join(' · ')}<br/>
+            <a href="#city-replay">Inspect this draft in the city ↑</a></p>}
           {preview && <details className="level-details"><summary>Preview this allocation</summary><p className="preview-result">72-hour draft preview · <strong>{number(preview.simulation.harm.totalUnsafePersonHours)} unsafe resident-hours</strong> · Safe-hours Gini {safeHoursGini(preview.simulation.harm)?.toFixed(3) ?? 'undefined'}. Zero indicates equal safe hours across residents.</p></details>}
           <button className="primary" disabled={!target || total !== 100} onClick={commit}>Commit response <ArrowRight size={16}/></button></section></>}
   </main>;

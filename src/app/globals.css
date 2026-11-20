@@ -274,3 +274,4 @@ button.explain-trigger:hover:enabled { border-color: var(--line); }
 .explain-reading small { color: var(--muted); font-size: .78rem; }
 .explain-reading button { min-height: 28px; padding: .15rem .4rem; }
 .supply .panel-explain { grid-column: 1 / -1; max-width: 32ch; }
+.hour-strip i[data-active=true] { outline: 2px solid white; outline-offset: -1px; }

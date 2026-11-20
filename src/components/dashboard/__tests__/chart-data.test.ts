@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { simulateReference } from '../../../lib/simulation/simulation';
-import { chartData } from '../chart-data';
+import { chartData, visibleLevelSeries } from '../chart-data';
 
 it('maps each hour and level to its chart series including percent of essential demand', () => {
   const snapshots = simulateReference('geothermal-failure', 'directorate');
@@ -16,4 +16,10 @@ it('maps each hour and level to its chart series including percent of essential 
       expect(point['t' + level.levelId]).toBe(level.temperatureCelsius);
     }
   }
+});
+
+it('labels overlapping power curves together and keeps distinct heat trajectories separate', () => {
+  const points = chartData(simulateReference('geothermal-failure', 'equity'));
+  expect(visibleLevelSeries(points, 'p').map(s => s.name)).toEqual(['Levels 1, 2, 3, 4, 5']);
+  expect(visibleLevelSeries(points, 't')).toHaveLength(5);
 });

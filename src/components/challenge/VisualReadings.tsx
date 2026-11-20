@@ -1,3 +1,4 @@
+import { stripHour } from './strip-hour';
 import { PanelExplain } from '../PanelExplain';
 import { exposureReading } from '../../lib/simulation/readings';
 import { useMemo } from 'react';
@@ -22,11 +23,8 @@ export function SafetyGrid({ series, hour, inspect }: {series: readonly HourlySn
     <PanelExplain title="district exposure strips" reading={exposureReading(harm.totalUnsafePersonHours) + ' Unsafe hours on levels 1 through 5: ' + harm.levels.map(l => l.unsafeHours).join(', ') + '.'}/>
     {harm.levels.map((level, i) => <div className="exposure-row" key={level.levelId}>
       <span>L{level.levelId}</span>
-      <button className="safety-strip" aria-label={'Inspect level ' + level.levelId + ' at hour ' + Math.max(1,hour)} onClick={e => {
-        const box = e.currentTarget.getBoundingClientRect();
-        const selected = e.detail ? Math.min(MODEL.hours, Math.max(1, 1 + Math.floor(MODEL.hours * (e.clientX - box.left) / box.width))) : Math.max(1,hour);
-        inspect(level.levelId, selected);
-      }}>{series.slice(1).map(s => <i key={s.hour} data-active={s.hour === hour} data-risk={isUnsafe(s.levels[i]!.hazards)}/>)}</button>
-      <div className="harm-bar"><span>{level.unsafePersonHours.toLocaleString('en-US')}</span><meter aria-label={'Level ' + level.levelId + ' unsafe resident-hours'} min={0} max={Math.max(1,...harm.levels.map(l=>l.unsafePersonHours))} value={level.unsafePersonHours}/></div>
-    </div>)}<small>Bars show residents × unsafe hours over the entire run.</small></section>;
+      <button className="safety-strip" aria-label={'Inspect level ' + level.levelId + ' at hour ' + Math.max(1,hour)} onClick={e => inspect(level.levelId, stripHour(e, hour))}>
+        {series.slice(1).map(s => <i key={s.hour} data-hour={s.hour} data-active={s.hour === hour} data-risk={isUnsafe(s.levels[i]!.hazards)}/>)}</button>
+      <div className="harm-bar"><span>{level.unsafePersonHours.toLocaleString('en-US')}</span><meter aria-label={'Level ' + level.levelId + ' unsafe resident-hours'} min={0} max={MODEL.hours * Math.max(...LEVELS.map(l => l.population))} value={level.unsafePersonHours}/></div>
+    </div>)}<small>Bars show residents × unsafe hours over the entire run. All runs share the same scale.</small></section>;
 }

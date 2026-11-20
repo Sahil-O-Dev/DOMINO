@@ -19,11 +19,11 @@ export function Replay({ a, b, names, target, initialHour = MODEL.hours }: {
     <label>Inspect district level <select value={level} onChange={e => setLevel(Number(e.target.value) as LevelId)}>
       {LEVELS.map(l => <option key={l.id} value={l.id}>Level {l.id}</option>)}
     </select></label>
-    <p className="footnote">Each strip shows all {MODEL.hours} hours. Hatched amber hours are unsafe.</p>
+    <p className="footnote">Each strip shows all {MODEL.hours} hours. Hatched amber hours are unsafe. The outline marks the inspected hour. Hour 0 precedes both strips.</p>
     {[a, b].map((series, i) => <div key={i}>
       <h3>{names[i]}</h3>
       <div className="hour-strip" aria-hidden="true">{series.slice(1).map(s =>
-        <i key={s.hour} className={isUnsafe(s.levels[index]!.hazards) ? 'hazard' : ''} />)}</div>
+        <i key={s.hour} data-active={s.hour === hour} className={isUnsafe(s.levels[index]!.hazards) ? 'hazard' : ''} />)}</div>
     </div>)}
     <label>Inspect hour <strong>{hour}</strong><input type="range" min="0" max={MODEL.hours} value={hour} onChange={e => setHour(Number(e.target.value))}/></label>
     {first >= 0 ? <button onClick={() => setHour(first)}>Jump to first safety difference · hour {first}</button>
