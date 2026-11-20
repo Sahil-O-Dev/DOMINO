@@ -30,3 +30,11 @@ it('passes follow-up questions and bounded history to Gemini before a plan is ap
   expect(JSON.parse(provider.mock.calls[0]![1].body).contents.map((c:{parts:{text:string}[]})=>c.parts[0]!.text)).toEqual(['What is harm?','Unsafe resident-hours.','Why?']);
   expect((await post({...payload,question:'  '})).status).toBe(400);
 });
+it('distinguishes provider quota errors from timeouts',async()=>{
+  user.mockResolvedValue({name:'Tester'});
+  vi.stubEnv('GEMINI_API_KEY','test-only');
+  vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(null,{status:429})));
+  expect((await POST(request())).status).toBe(429);
+  vi.stubGlobal('fetch',vi.fn().mockRejectedValue(new DOMException('Timed out','TimeoutError')));
+  expect((await POST(request())).status).toBe(504);
+});

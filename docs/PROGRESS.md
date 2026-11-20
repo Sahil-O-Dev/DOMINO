@@ -16,6 +16,8 @@ Verification: all 36 existing tests passed in 5 files; Next.js production build 
 
 ## Current snapshot
 
+- Verified live Gemini generation using the configured server key and a signed-in production Chrome walkthrough. The original model exceeded the 30-second deadline; the advisor now uses Flash-Lite with a short-answer budget and distinguishes timeout, quota and permission errors. 53 tests and type checking passed.
+
 - Advisor chat accepts typed questions before or after applying a plan and sends the last six exchanges for follow-ups. 52 tests, strict types and build passed. Live provider verification still needs server credentials.
 
 - Merged the teammate’s Gemini advisor into the signed-in dashboard with a discoverable guest entry and authenticated server-side REST integration. Missing credentials prevent live verification. Owner to set GEMINI_API_KEY in the local server environment. Local tests cover authorization, missing-key behavior and a mocked provider response.

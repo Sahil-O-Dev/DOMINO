@@ -39,7 +39,7 @@ export async function POST(request:Request) {
   const prompt=`You are DOMINO's AI emergency response advisor.
 
 DOMINO simulates a fictional underground city with five levels.
-A geothermal failure affects electricity, temperature, and water.
+A geothermal failure affects electricity, temperature, and water. One unsafe resident-hour means one resident spending one hour on a level with temperature above 32 °C, water quality below 70, or essential power below 60%. Overlapping hazards count once.
 
 The user has 100 credits to allocate between:
 - Ventilation restoration
@@ -65,17 +65,24 @@ IMPORTANT RULES:
 - Use simple language suitable for a hackathon demo.
 `;
   try {
-    const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent',{
+    const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent',{
       method:'POST', headers:{'Content-Type':'application/json','x-goog-api-key':apiKey},
-      body:JSON.stringify({systemInstruction:{parts:[{text:prompt}]},contents:[...conversation,{role:'user',parts:[{text:question}]}]}),signal:AbortSignal.timeout(30000),cache:'no-store',
+      body:JSON.stringify({generationConfig:{thinkingConfig:{thinkingLevel:'MINIMAL'},maxOutputTokens:512},systemInstruction:{parts:[{text:prompt}]},contents:[...conversation,{role:'user',parts:[{text:question}]}]}),signal:AbortSignal.timeout(60000),cache:'no-store',
     });
-    if(!response.ok)throw new Error('Provider unavailable');
+    if(!response.ok){
+      const message = response.status===429 ? 'Gemini reached a rate or quota limit. Check the project quota in Google AI Studio before retrying.'
+        : [401,403].includes(response.status) ? 'Google denied access. Check the Gemini key and its project permissions.'
+        : response.status===404 ? 'Google did not find the configured Gemini model.'
+        : 'Google could not process this request (HTTP '+response.status+').';
+      return Response.json({error:message},{status:response.status===429?429:502});
+    }
     const result=await response.json();
     const parts=result.candidates?.[0]?.content?.parts ?? [];
     const explanation=parts.filter((p:{text?:string;thought?:boolean})=>!p.thought && typeof p.text==='string').map((p:{text:string})=>p.text).join('').trim();
-    if(!explanation)throw new Error('Empty response');
+    if(!explanation)return Response.json({error:'Gemini returned no answer. Try rephrasing the question.'},{status:502});
     return Response.json({explanation});
-  } catch {
-    return Response.json({error:'Gemini could not generate an explanation. Check the server key and quota, then retry.'},{status:502});
+  } catch (error) {
+    const timedOut=error instanceof Error && error.name==='TimeoutError';
+    return Response.json({error:timedOut?'Gemini took longer than one minute. Please retry.':'Could not reach Gemini. Please retry when the connection is available.'},{status:timedOut?504:502});
   }
 }
