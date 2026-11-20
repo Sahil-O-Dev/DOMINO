@@ -16,6 +16,8 @@ Verification: all 36 existing tests passed in 5 files; Next.js production build 
 
 ## Current snapshot
 
+- Reproduced the apparent playback freeze on the live local challenge. The default draft hit a mandatory pause at hour 1. Continuous playback is now the default, with the hazard pause available by checkbox. The clock advances from elapsed time. The local in-app browser reached hour 72 on a single click and verified replay, optional hazard pause, resume, and manual pause. All 65 tests, type checking and the build passed. Ready for owner review.
+
 - Fixed the funding replay and its charts to use the active exact-budget draft before commitment. Edits preserve the inspected floor and hour, pause playback and clear the untreated comparison. Under Directorate at hour 72, Chrome verified that moving all spending from repairs to redistribution changes the unsafe floors from 4/5 to 2/3. Also verified first-hazard pause, resume, restart, full untreated split, heat-strip selection, overlapping allocation and power curves, and common scatter axes. All 63 tests, strict type checking and the production build passed. Project owner to review the live funding preview.
 
 - Added inline Explain buttons to data panels in the control room, guest challenge, replay, and Handoff. Readings follow current panel values. Guests receive local readings, and the signed-in advisor can interpret a panel on demand. All 59 tests, strict type checking, and the production build passed. Chrome verified the guest view at 375 px, signed-in interactions with mocked AI, switching readings, reopening, fallback and retry, and isolation of the official feed. Project owner to review the demo experience.

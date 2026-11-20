@@ -7,7 +7,7 @@ import { ZERO_ALLOCATION } from '../../lib/simulation/interventions';
 import { Cascade } from './Cascade';
 import { FloorLight, SafetyGrid } from './VisualReadings';
 import Link from 'next/link';
-import { replayClock } from './replay-clock';
+import { elapsedReplayHours, REPLAY_HOUR_MS, replayClock } from './replay-clock';
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import { Pause, Play, SkipForward } from 'lucide-react';
 import { LEVELS, MODEL, isUnsafe } from '../../lib/simulation/simulation';
@@ -37,6 +37,7 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
   const [{ hour, floor, playing }, dispatch] = useReducer(replayClock, {
     hour: 0, floor: target ?? 1, playing: autoplay,
   });
+  const [pauseAtHazard, setPauseAtHazard] = useState(false);
   const [pinned, setPinned] = useState(false);
   const [holding, setHolding] = useState(false);
   const [split, setSplit] = useState(0);
@@ -62,18 +63,18 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
 
   useEffect(() => {
     if (!playing) return;
-    const onset = firstHazard && first ? { hour: firstHazard.hour, floor: first.levelId } : undefined;
-    const timer = window.setInterval(() => dispatch({ type: 'tick', first: onset }), 260);
-    function pauseInBackground() {
-      if (document.hidden) dispatch({ type: 'pause' });
-    }
-    pauseInBackground();
-    document.addEventListener('visibilitychange', pauseInBackground);
-    return () => {
-      window.clearInterval(timer);
-      document.removeEventListener('visibilitychange', pauseInBackground);
-    };
-  }, [playing, firstHazard, first]);
+    const breakpoint = pauseAtHazard && firstHazard && first ? { hour: firstHazard.hour, floor: first.levelId } : undefined;
+    const startedAt = performance.now();
+    let advanced = 0;
+    const timer = window.setInterval(() => {
+      const elapsed = elapsedReplayHours(performance.now() - startedAt);
+      if (elapsed > advanced) {
+        dispatch({ type: 'advance', hours: elapsed - advanced, breakpoint });
+        advanced = elapsed;
+      }
+    }, REPLAY_HOUR_MS);
+    return () => window.clearInterval(timer);
+  }, [playing, pauseAtHazard, firstHazard, first]);
 
   function pause() { dispatch({ type: 'pause' }); }
   function seek(hour: number) { dispatch({ type: 'inspect', hour }); }
@@ -152,6 +153,8 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
       <div className="supply"><span>District supply</span><strong>{current.availablePower} / {MODEL.normalPower}</strong><meter min={0} max={MODEL.normalPower} value={current.availablePower} aria-label="Available district power"/>
         <PanelExplain title="district supply" onOpen={pause} reading={`At hour ${hour}, the district can supply ${current.availablePower} of the ${MODEL.normalPower} units residents need. Redistributing power changes which floors receive it.`}/></div>
     </div>
+    <label className="hazard-pause"><input type="checkbox" checked={pauseAtHazard}
+      onChange={e => setPauseAtHazard(e.target.checked)}/> Pause at the first unsafe hour</label>
     <p className="section-caption" role="status">{atThreshold
       ? (playing ? 'First unsafe hour' : 'First unsafe hour · Paused · Resume to continue') + ' · Level ' + first.levelId + ' · ' + warnings(first) + (firstLevels && firstLevels.length > 1 ? '. Also unsafe: ' + firstLevels.slice(1).map(l => 'Level ' + l.levelId).join(', ') : '')
       : hour === 0 && !showingUntreated ? 'Before the outage. Power, cooling and repairs start from the same initial conditions in every plan.'
