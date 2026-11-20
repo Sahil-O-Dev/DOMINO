@@ -29,6 +29,8 @@ Only user-authorized decisions belong in the table. The initial brief authorizes
 
 | 2026-11-20 | Permit on-demand external Gemini explanations in the signed-in dashboard. | Owner approved AI for the advisor. Simulation and scoring remain deterministic. |
 
+| 2026-11-20 | Add the owner-approved illustrative per-floor severity index and per-hazard magnitude and duration to the replay. See SPEC for the three scales. | The owner requested both a combined measure of danger and its causes. Binary exposure and optimizer scoring retain their original meaning. |
+
 ## Pending review — not approved decisions
 
 - Review Stage 5 and authorize Stage 6 separately from any model amendment.

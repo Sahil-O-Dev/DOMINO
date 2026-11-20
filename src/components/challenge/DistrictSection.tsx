@@ -1,5 +1,6 @@
 'use client';
 
+import { FloorSeverity, severityLabel } from '../FloorSeverity';
 import { PanelExplain } from '../PanelExplain';
 import { floorReading } from '../../lib/simulation/readings';
 import { IllustrativeLayer } from './IllustrativeLayer';
@@ -94,15 +95,15 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
         {current.levels.map(level => {
           const unsafe = isUnsafe(level.hazards);
           return <button key={level.levelId} type="button" className="section-floor" aria-pressed={floor === level.levelId}
-            aria-label={'Inspect level ' + level.levelId + (unsafe ? ', unsafe' : ', safe')} data-unsafe={unsafe}
+            aria-label={'Inspect level ' + level.levelId + ', ' + severityLabel(level).toLowerCase()} data-unsafe={unsafe}
 
             onClick={() => dispatch({type: 'inspect', floor: level.levelId})}>
             <FloorLight level={level}/>
             {funded && !comparison && split > 0 && <span className="split-layer" style={{clipPath: 'inset(0 ' + (100 - split) + '% 0 0)'}}><FloorLight level={untreated[hour]!.levels[level.levelId - 1]!}/></span>}
             {funded && !comparison && split > 0 && <i className="split-line" style={{left: split + '%'}}/>}
             <span className="floor-id">Level {level.levelId}</span>
-            {funded && !comparison && split>0 && <span className="left-safety">Untreated · {isUnsafe(untreated[hour]!.levels[level.levelId-1]!.hazards) ? '△ Unsafe' : 'Safe'}</span>}
-            {!(funded && !comparison && split===100) && <span className={unsafe ? 'floor-alert' : 'floor-safe'}>{unsafe ? '△ ' + [level.hazards.heat && 'Excess heat', level.hazards.water && 'Poor water quality', level.hazards.power && 'Low power'].filter(Boolean).join(' · ') : '✓ Safe'}</span>}
+            {funded && !comparison && split>0 && <span className="left-safety">Untreated · {severityLabel(untreated[hour]!.levels[level.levelId-1]!)}</span>}
+            {!(funded && !comparison && split===100) && <span className={unsafe ? 'floor-alert' : 'floor-safe'}>{unsafe ? '△ ' + severityLabel(level) : '✓ Safe'}</span>}
           </button>;
         })}
         {funded && !comparison && <button type="button" className="split-grip" role="slider" aria-label="Drag cutaway comparison" aria-valuemin={0} aria-valuemax={100} aria-valuenow={split}
@@ -121,7 +122,8 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
       <aside className="section-inspector">
         <p className="eyebrow">{runLabel} · {policy} · Hour {hour}</p>
         {!showingUntreated && <p className="footnote">{allocation.ventilationCredits} ventilation · {allocation.recyclerCredits} repairs · {allocation.redistributionCredits} redistribution</p>}
-        <h2>Level {floor}</h2><p>{isUnsafe(reading.hazards) ? 'Residents here are exposed to unsafe conditions.' : 'Power, temperature and water are within safe limits here.'}</p>
+        <h2>Level {floor}</h2>
+        <FloorSeverity series={series} hour={hour} floor={floor}/>
         <PanelExplain title={'level ' + floor + ' conditions'} onOpen={pause}
           reading={runLabel + '. ' + floorReading(reading, hour)}/>
         <details className="level-details"><summary>View floor readings</summary>

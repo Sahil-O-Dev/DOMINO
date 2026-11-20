@@ -98,6 +98,12 @@ Lower is better. The fairness slider controls lambda in [0, 2]; its step size is
 
 Current unsafe population = sum of populations whose current hazard union is true. It differs from cumulative person-hours. Hazard-specific exposure totals overlap and must not be added to obtain H.
 
+## Approved illustrative floor severity
+
+At each floor and hour, compute three positive threshold excursions. Heat excess is max(0, T − 32) in °C, water shortfall is max(0, 70 − Q) in index points, and power shortfall is max(0, 0.60 − p) as a fraction of essential demand.
+
+The dimensionless hourly severity index is heat excess / 8 + water shortfall / 65 + power shortfall / 0.60. One unit represents one reference-sized excursion or several contributions adding to one. The scales come from the baseline heat gain, water power penalty and minimum power fraction. The index may exceed one. It describes modeled conditions at the selected hour and has no clinical calibration. For each active hazard, separately count consecutive evaluated hours through the selected snapshot. Recovery resets that hazard’s duration. Hour 0 is pre-outage. H, D, binary safety and optimizer rankings keep their existing definitions.
+
 ## Exhaustive optimization and comparison
 
 Enumerate nonnegative integers a, b, c with a + b + c = 10, then set `(V,R,X) = (10a,10b,10c)`. There are `(12 choose 2) = 66` plans. For each plan under each policy, run 72 hours, compute H and D, and store the outcome and trajectory: 132 candidate outcomes. Lambda changes only scores and rankings, never cached simulations.

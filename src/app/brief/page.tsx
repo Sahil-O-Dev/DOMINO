@@ -26,6 +26,7 @@ export default async function Home() {
       <p>Residents stay on their starting level and share its conditions. Demand and population stay fixed. Hour 0 starts at full supply. The geothermal outage begins at hour 1 and lasts through hour {MODEL.hours}.</p>
       <p>Both policies distribute the same finite supply. Ventilation changes cooling efficiency, recycler repairs affect water from hour 25, and redistribution changes the priority weights. Each hour’s temperature feeds that hour’s water update.</p>
       <p>A resident counts once per unsafe hour if temperature exceeds {MODEL.unsafeTemperature} °C, water falls below {MODEL.unsafeWater}, or essential power falls below {MODEL.unsafePower*100}%. Exposure is measured in resident-hours. The thresholds and water index are fictional. The baseline uses fixed inputs. The optional illustrative layer samples 500 alternative runs and reports synthetic health ranges. Its assumptions and coefficients are listed beside the results.</p>
+      <p>The hourly severity index adds the size of each threshold crossing relative to its reference scale ({MODEL.heatGain} °C for heat, {MODEL.waterPowerPenalty} points for water, and {MODEL.unsafePower * 100} percentage points for power). Longer exposure appears separately as consecutive hours.</p>
     </section>
   </main>;
 }

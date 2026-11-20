@@ -276,3 +276,7 @@ button.explain-trigger:hover:enabled { border-color: var(--line); }
 .supply .panel-explain { grid-column: 1 / -1; max-width: 32ch; }
 .hour-strip i[data-active=true] { outline: 2px solid white; outline-offset: -1px; }
 .hazard-pause { display: flex; align-items: center; gap: .45rem; margin-top: .65rem; font-size: .875rem; color: var(--muted); }
+.floor-severity { margin: .65rem 0; font-size: .9rem; line-height: 1.45; }
+.floor-severity p { margin: .35rem 0; }
+.floor-severity ul { padding-left: 1.15rem; margin: .3rem 0; }
+.floor-severity summary { color: var(--muted); cursor: pointer; }

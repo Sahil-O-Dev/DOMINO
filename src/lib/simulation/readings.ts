@@ -1,7 +1,13 @@
+import { floorSeverity } from './severity';
 import { LEVELS, MODEL } from './simulation';
 import type { LevelSnapshot, ResourceAllocation } from './types';
 
 export const displayNumber = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format;
+
+/** Keep a positive excursion visible even when the regular display rounds it to zero. */
+export function displayMagnitude(value: number) {
+  return value > 0 && value < 0.01 ? '<0.01' : displayNumber(value);
+}
 
 export function floorReading(level: LevelSnapshot, hour: number) {
   const reasons = [
@@ -10,7 +16,7 @@ export function floorReading(level: LevelSnapshot, hour: number) {
     level.hazards.water && 'water quality below ' + MODEL.unsafeWater,
   ].filter(Boolean);
   const status = reasons.length ? 'Its residents count as exposed because of ' + reasons.join(' and ') : 'All three readings meet the modeled safety thresholds';
-  return `At hour ${hour}, level ${level.levelId} has ${displayNumber(level.powerFraction * 100)}% of essential power, a temperature of ${displayNumber(level.temperatureCelsius)} °C and water quality of ${displayNumber(level.waterQuality)}/100. ${status}.`;
+  return `At hour ${hour}, level ${level.levelId} has ${displayNumber(level.powerFraction * 100)}% of essential power, a temperature of ${displayNumber(level.temperatureCelsius)} °C and water quality of ${displayNumber(level.waterQuality)}/100. ${status}. Hourly severity is ${displayMagnitude(floorSeverity(level).index)} on the illustrative index.`;
 }
 
 export function budgetReading(draft: ResourceAllocation) {

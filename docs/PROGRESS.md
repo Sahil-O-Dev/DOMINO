@@ -16,6 +16,8 @@ Verification: all 36 existing tests passed in 5 files; Next.js production build 
 
 ## Current snapshot
 
+- Added the approved per-floor hourly severity index and per-hazard magnitude and duration. An independent 50-digit decimal implementation agreed on all 47,520 evaluated floor-hour hazard masks across the 132 plans. Browser verification at Directorate hour 72 showed level 5 severity 1.45 untreated versus 1.28 with 100 repair credits. In both runs power was below threshold for 72 hours. All 69 tests, strict type checking and production build passed. Owner to review the illustrative severity readout.
+
 - Reproduced the apparent playback freeze on the live local challenge. The default draft hit a mandatory pause at hour 1. Continuous playback is now the default, with the hazard pause available by checkbox. The clock advances from elapsed time. The local in-app browser reached hour 72 on a single click and verified replay, optional hazard pause, resume, and manual pause. All 65 tests, type checking and the build passed. Ready for owner review.
 
 - Fixed the funding replay and its charts to use the active exact-budget draft before commitment. Edits preserve the inspected floor and hour, pause playback and clear the untreated comparison. Under Directorate at hour 72, Chrome verified that moving all spending from repairs to redistribution changes the unsafe floors from 4/5 to 2/3. Also verified first-hazard pause, resume, restart, full untreated split, heat-strip selection, overlapping allocation and power curves, and common scatter axes. All 63 tests, strict type checking and the production build passed. Project owner to review the live funding preview.

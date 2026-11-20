@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { PanelExplain } from "../PanelExplain";
 import { floorReading, budgetReading, exposureReading, deepReading } from "../../lib/simulation/readings";
+import { severityLabel } from "../FloorSeverity";
 import { AdvisorBriefing } from "./AdvisorBriefing";
 import { Trajectories } from "./Trajectories";
 import { Activity, RotateCcw } from "lucide-react";
@@ -202,7 +203,7 @@ export function Dashboard() {
               <div className="level-heading">
                 <h3>Level {level.levelId}</h3>
                 <span>{format(LEVELS[i]!.population)} residents</span>
-                <strong>{isUnsafe(level.hazards) ? "Unsafe" : "Safe"}</strong>
+                <strong>{severityLabel(level)}</strong>
               </div>
               <div className="level-values">
                 <span>
