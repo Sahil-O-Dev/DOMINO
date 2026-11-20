@@ -21,7 +21,7 @@ export default async function Home() {
       <div><Clock3/><span>Time horizon<strong>{MODEL.hours} hours</strong></span></div>
       <div><Zap/><span>Supply after failure<strong>{MODEL.failedPower} / {MODEL.normalPower} units</strong></span></div>
     </div>
-    <section className="brief" id="scenario"><h2>Scenario brief</h2><p>Trigger a geothermal failure and inspect power, heat and water quality across the district. Allocate 100 emergency credits, then compare how two power policies distribute exposure over {MODEL.hours} hours.</p></section>
+    <section className="brief" id="scenario"><h2>Scenario brief</h2><p>When a geothermal plant fails, the Directorate protects the upper levels and the deepest tunnels lose essential power first. Trigger the outage to inspect power, heat and water before emergency aid arrives. Allocate 100 emergency credits, then compare how two power policies distribute exposure over {MODEL.hours} hours.</p></section>
     <section className="visual-panel"><h2>Model assumptions</h2>
       <p>Residents stay on their starting level and share its conditions. Demand and population stay fixed. Hour 0 starts at full supply. The geothermal outage begins at hour 1 and lasts through hour {MODEL.hours}.</p>
       <p>Both policies distribute the same finite supply. Ventilation changes cooling efficiency, recycler repairs affect water from hour 25, and redistribution changes the priority weights. Each hour’s temperature feeds that hour’s water update.</p>

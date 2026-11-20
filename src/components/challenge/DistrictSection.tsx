@@ -28,13 +28,14 @@ interface SectionProps {
   policy:PowerPolicy;
   allocation?:ResourceAllocation;
   autoplay?: boolean;
+  openingOutage?: boolean;
   untreated: readonly HourlySnapshot[];
   funded?: readonly HourlySnapshot[] | undefined;
   target: LevelId | null;
   represent?: (level: LevelId) => void;
 }
 
-export function DistrictSection({ untreated, funded, target, represent, policy, allocation=ZERO_ALLOCATION, autoplay = false }: SectionProps) {
+export function DistrictSection({ untreated, funded, target, represent, policy, allocation=ZERO_ALLOCATION, autoplay = false, openingOutage = false }: SectionProps) {
   const [{ hour, floor, playing }, dispatch] = useReducer(replayClock, {
     hour: 0, floor: target ?? 1, playing: autoplay,
   });
@@ -54,7 +55,7 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
   const comparison = pinned || holding;
   const showingUntreated = !funded || comparison || split === 100;
   const series = showingUntreated ? untreated : funded;
-  const runLabel = showingUntreated ? 'Untreated outage' : represent ? 'Draft response' : 'Funded response';
+  const runLabel = openingOutage ? 'Opening outage · 0 credits' : showingUntreated ? 'Untreated outage' : represent ? 'Draft response' : 'Funded response';
   const current = series[hour]!;
   const reading = current.levels[floor - 1]!;
   const firstHazard = useMemo(() => series.find(s => s.hour > 0 && s.levels.some(l => isUnsafe(l.hazards))), [series]);
@@ -86,7 +87,9 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
       <div><p className="eyebrow">DOMINO / District section</p><h1>The Hollow</h1></div>
       <div className="actions"><Link className="primary" href="/handoff">Start The Handoff</Link><Link className="text-link" href="/domino#ai-advisor">AI Advisor</Link><Link className="text-link" href="/brief">Scenario brief</Link><Link className="outline-link" href="/domino">Inspect data ↗</Link></div>
     </div>
-    {represent && <p className="scene-prompt">{funded && showingUntreated
+    {represent && <p className="scene-prompt">{openingOutage
+      ? 'The Directorate rations power to the upper levels first. Trigger the geothermal failure to see what reaches the deep tunnels before emergency crews intervene.'
+      : funded && showingUntreated
       ? 'Comparing with the untreated outage. Return the comparison controls to the draft to inspect funded conditions.'
       : funded ? 'Your 100-credit draft is ready. Play the outage or scrub to an hour, then change the funding to compare the same moment.'
       : 'Allocate exactly 100 credits to preview your draft. The city currently shows the untreated outage.'}</p>}
@@ -149,7 +152,7 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
     </div>
     <div className="exhibit-transport">
       <button className="primary" onClick={() => dispatch({ type: 'toggle' })}>{playing ? <Pause size={16}/> : <Play size={16}/>}
-        {playing ? 'Pause' : hour === 0 ? represent || !funded ? 'Trigger failure' : 'Play response' : hour === MODEL.hours ? 'Replay' : 'Resume'}</button>
+        {playing ? 'Pause' : hour === 0 ? openingOutage ? 'Trigger failure' : showingUntreated ? 'Play untreated outage' : 'Play response' : hour === MODEL.hours ? 'Replay' : 'Resume'}</button>
       <label>Hour {hour} / {MODEL.hours}<input type="range" aria-label="District replay hour" min={0} max={MODEL.hours} value={hour} onPointerDown={pause} onChange={e => seek(Number(e.target.value))}/></label>
       <button aria-label="Skip to final hour" onClick={() => seek(MODEL.hours)}><SkipForward size={16}/></button>
       <div className="supply"><span>District supply</span><strong>{current.availablePower} / {MODEL.normalPower}</strong><meter min={0} max={MODEL.normalPower} value={current.availablePower} aria-label="Available district power"/>

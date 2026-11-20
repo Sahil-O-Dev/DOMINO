@@ -16,6 +16,8 @@ Verification: all 36 existing tests passed in 5 files; Next.js production build 
 
 ## Current snapshot
 
+- Aligned the opening challenge with the Hollow brief. Trigger failure now runs the zero-credit Directorate outage. At hour 1, the in-app browser showed levels 1–4 within limits and level 5 power-unsafe. Previewing the Equity 40/30/30 draft at the same hour shifted exposure to levels 1–2, and returning to the opening outage preserved the draft. All 70 tests, strict type checking and the production build passed. Ready for owner review.
+
 - Added the approved per-floor hourly severity index and per-hazard magnitude and duration. An independent 50-digit decimal implementation agreed on all 47,520 evaluated floor-hour hazard masks across the 132 plans. Browser verification at Directorate hour 72 showed level 5 severity 1.45 untreated versus 1.28 with 100 repair credits. In both runs power was below threshold for 72 hours. All 69 tests, strict type checking and production build passed. Owner to review the illustrative severity readout.
 
 - Reproduced the apparent playback freeze on the live local challenge. The default draft hit a mandatory pause at hour 1. Continuous playback is now the default, with the hazard pause available by checkbox. The clock advances from elapsed time. The local in-app browser reached hour 72 on a single click and verified replay, optional hazard pause, resume, and manual pause. All 65 tests, type checking and the build passed. Ready for owner review.

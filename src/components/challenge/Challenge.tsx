@@ -86,17 +86,20 @@ function Debrief({ ranked, chosen, previous, target, retry, outcomes }: {
 
 export function Challenge() {
   const [target, setTarget] = useState<LevelId | null>(null);
-  const [policy, setPolicy] = useState<PowerPolicy>('equity');
+  const [policy, setPolicy] = useState<PowerPolicy>('directorate');
+  const [openingOutage, setOpeningOutage] = useState(true);
   const [draft, setDraft] = useState<ResourceAllocation>(initialPlan);
   const [chosen, setChosen] = useState<RankedPlan | null>(null);
   const [previous, setPrevious] = useState<PlanOutcome | null>(null);
   const [cache] = useState(createOutcomeCache);
   const [ranked, setRanked] = useState<readonly RankedPlan[]>([]);
   const total = fields.reduce((sum, [key]) => sum + draft[key], 0);
-  const untreated = useMemo(() => simulateReference('geothermal-failure', policy), [policy]);
+  const replayPolicy = openingOutage ? 'directorate' : policy;
+  const untreated = useMemo(() => simulateReference('geothermal-failure', replayPolicy), [replayPolicy]);
   const preview = useMemo(()=> total===100 ? cache.getOutcomes().find(o=>o.policy===policy && sameAllocation(o.allocation,draft)) : undefined,[cache,policy,draft,total]);
   function revise() {
     if (!chosen) return;
+    setOpeningOutage(false);
     setPrevious(chosen.outcome);
     setChosen(null);
     requestAnimationFrame(() => document.getElementById('fund-response')?.scrollIntoView());
@@ -111,18 +114,19 @@ export function Challenge() {
   }
   return <main id="main-content" className="shell challenge">
     {chosen && target ? <Debrief outcomes={cache.getOutcomes()} ranked={ranked} chosen={chosen} target={target} previous={previous} retry={revise}/> : <>
-      <DistrictSection policy={policy} untreated={untreated} target={target} represent={setTarget}
-        funded={preview?.simulation.snapshots} allocation={draft}/>
+      <DistrictSection policy={replayPolicy} untreated={untreated} target={target} represent={setTarget}
+        openingOutage={openingOutage} funded={openingOutage ? undefined : preview?.simulation.snapshots} allocation={draft}/>
       <section className="panel funding" id="fund-response"><h2>Fund your response</h2>
           <p>Allocate 100 emergency credits for the district. {target ? 'You represent level ' + target + '.' : 'Choose the floor you represent in the section above.'}</p>
           {previous && <p className="footnote">When you commit, you’ll see how this response compares with your last one.</p>}
           <PanelExplain title="response budget" reading={budgetReading(draft) + (preview ? ' Under ' + policy + ', this draft produces ' + number(preview.simulation.harm.totalUnsafePersonHours) + ' unsafe resident-hours.' : '')}/>
-          <label>Power policy <select value={policy} onChange={e => setPolicy(e.target.value as PowerPolicy)}><option value="equity">Equity · proportional to demand</option><option value="directorate">Directorate · upper levels first</option></select></label>
+          <label>Power policy <select value={policy} onChange={e => {setPolicy(e.target.value as PowerPolicy); setOpeningOutage(false);}}><option value="directorate">Directorate · upper levels first</option><option value="equity">Equity · proportional to demand</option></select></label>
           {fields.map(([key, title, detail]) => <label key={key} className="budget-row"><span><strong>{title}</strong><small>{detail}</small></span>
-            <select aria-label={title} value={draft[key]} onChange={e => setDraft({...draft, [key]: Number(e.target.value)})}>{Array.from({length:11}, (_, i) => <option key={i}>{i * 10}</option>)}</select></label>)}
+            <select aria-label={title} value={draft[key]} onChange={e => {setDraft({...draft, [key]: Number(e.target.value)}); setOpeningOutage(false);}}>{Array.from({length:11}, (_, i) => <option key={i}>{i * 10}</option>)}</select></label>)}
           <p role="status">{total} / 100 credits · {total !== 100 ? 'Allocate exactly 100 to preview your response.' : !target ? 'Choose a level to represent.' : 'Ready to commit for level ' + target + '.'}</p>
-          {preview && <p className="draft-replay-summary">Unsafe hours on each floor over the full run · {preview.simulation.harm.levels.map(l => 'L' + l.levelId + ' ' + l.unsafeHours + 'h').join(' · ')}<br/>
-            <a href="#city-replay">Inspect this draft in the city ↑</a></p>}
+          {preview && <p className="draft-replay-summary">Draft forecast · Unsafe hours per floor · {preview.simulation.harm.levels.map(l => 'L' + l.levelId + ' ' + l.unsafeHours + 'h').join(' · ')}<br/>
+            <a href="#city-replay" onClick={() => setOpeningOutage(false)}>Inspect this draft in the city ↑</a></p>}
+          {!openingOutage && <p><a href="#city-replay" onClick={() => setOpeningOutage(true)}>View the opening Directorate outage</a></p>}
           {preview && <details className="level-details"><summary>Preview this allocation</summary><p className="preview-result">72-hour draft preview · <strong>{number(preview.simulation.harm.totalUnsafePersonHours)} unsafe resident-hours</strong> · Safe-hours Gini {safeHoursGini(preview.simulation.harm)?.toFixed(3) ?? 'undefined'}. Zero indicates equal safe hours across residents.</p></details>}
           <button className="primary" disabled={!target || total !== 100} onClick={commit}>Commit response <ArrowRight size={16}/></button></section></>}
   </main>;
