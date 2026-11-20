@@ -25,6 +25,8 @@ Only user-authorized decisions belong in the table. The initial brief authorizes
 
 | 2026-11-19 | Enable real accounts and lift the client-only constraint for authentication. | The project owner selected real accounts. The simulation and planner continue to run locally in the browser. See [PROJECT.md](PROJECT.md) for the implementation. |
 
+| 2026-11-19 | Add an opt-in illustrative uncertainty and health layer with 500 fixed-seed runs, the owner-specified distributions, a 12-hour respiratory lag and illustrative excess-exposure coefficients. | Owner authorized synthetic risk ranges separately from deterministic replay, optimizer and scores. See SPEC for interpretation. |
+
 ## Pending review — not approved decisions
 
 - Review Stage 5 and authorize Stage 6 separately from any model amendment.

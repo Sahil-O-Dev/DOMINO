@@ -202,3 +202,37 @@ button.section-floor:focus-visible { outline-offset: -4px; }
 .exhibit input[type=range], .exhibit input[type=checkbox] { accent-color: var(--ivory); }
 button.section-floor { min-height: 0; }
 button.section-floor[data-unsafe=true] { box-shadow: inset 3px 0 #ffc28a; }
+
+.section-floor { position: relative; overflow: hidden; isolation: isolate; }
+.floor-veil,.split-layer { position:absolute; inset:0; pointer-events:none; }
+.floor-veil i { position:absolute; inset:0; background:#111; }
+@media(prefers-reduced-motion:no-preference){.floor-veil i { animation: power-dip 2.9s ease-in-out infinite; } @keyframes power-dip { 0%,70%,100% {transform:scaleX(1);filter:opacity(.25)} 80%,92% {filter:opacity(.9)} } }
+.split-layer { background-image:url('/district-section.webp'); background-size:100% 500%; }
+.section-floor:nth-child(2) .split-layer { background-position:center 25%; }
+.section-floor:nth-child(3) .split-layer { background-position:center 50%; }
+.section-floor:nth-child(4) .split-layer { background-position:center 75%; }
+.section-floor:nth-child(5) .split-layer { background-position:center 100%; }
+.split-line { position:absolute; inset-block:0; width:2px; background:ivory; }
+.floor-id,.floor-alert { position:relative; }
+.visual-panel { margin-block:16px; padding:clamp(14px,2vw,24px); border:1px solid var(--line); border-radius:6px; background:var(--panel); }
+.visual-panel p,.visual-panel small { color:var(--muted); line-height:1.55; }
+.exposure-row { display:grid; grid-template-columns:2ch 1fr minmax(75px,18%); gap:10px; align-items:center; margin:6px 0; font-size:.8rem; }
+button.safety-strip { display:flex; gap:0; min-height:26px; padding:0; overflow:hidden; }
+.safety-strip i { flex:1; height:24px; background:#718f80; }
+.safety-strip i[data-risk=true] { background:repeating-linear-gradient(130deg,#efb481 0 3px,#775330 3px 5px); }
+.safety-strip i[data-active=true] { outline:2px solid white; outline-offset:-1px; }
+.harm-bar {display:grid;} .harm-bar meter {width:100%;}
+.allocation-plot,.cascade-graph { width:100%; max-width:680px; display:block; }
+.allocation-plot circle[fill="#9ccdb6"] {cursor:pointer;}
+.flow-pair { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); }
+.flow-pair figure {margin:12px; max-width:400px; }
+.flow-pair svg {width:100%;}
+.event-log {max-height:10rem; overflow:auto; line-height:1.7; }
+.visual-panel summary {cursor:pointer; font-weight:bold;}
+@media(prefers-reduced-motion:no-preference){.cascade-graph.running path {animation: cascade-flow 1.5s linear infinite;} @keyframes cascade-flow{to{stroke-dashoffset:-20;}}}
+.section-plate {position:relative;}
+button.split-grip {position:absolute;z-index:2;top:47%;transform:translateX(-50%);border-radius:50%;min-height:32px;width:32px;padding:0;touch-action:none;cursor:ew-resize;}
+.left-safety {position:absolute;left:2%;bottom:2%;background:#111b16df;color:#eee;padding:2px 4px;font-size:.7rem;}
+.safety-strip i[data-band=unsafe] { background:#5b536c; }
+.safety-strip i[data-band=mixed] { background:repeating-linear-gradient(130deg,#eab988 0 2px,#65452f 2px 4px); }
+.safety-strip i[data-band=safe] { background:#bfcebb; }

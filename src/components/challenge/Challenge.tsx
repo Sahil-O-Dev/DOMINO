@@ -1,12 +1,15 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { ResultCard } from './ResultCard';
+import { PlanSpace, allocationText } from './PlanSpace';
+import { safeHoursGini } from '../../lib/simulation/equity';
 import { DistrictSection } from './DistrictSection';
 import { ArrowRight } from 'lucide-react';
 import { calculateHarm } from '../../lib/simulation/metrics';
 import { createOutcomeCache, rankPlans, sameAllocation } from '../../lib/simulation/ranking';
 import { LEVELS, MODEL, isUnsafe, simulateReference } from '../../lib/simulation/simulation';
-import type { HourlySnapshot, LevelId, PowerPolicy, RankedPlan, ResourceAllocation } from '../../lib/simulation/types';
+import type { HourlySnapshot, LevelId, PlanOutcome, PowerPolicy, RankedPlan, ResourceAllocation } from '../../lib/simulation/types';
 
 const initialPlan = { ventilationCredits: 40, recyclerCredits: 30, redistributionCredits: 30 };
 const fields = [
@@ -49,10 +52,13 @@ function Replay({ a, b, names, target }: {
   </div>;
 }
 
-function Debrief({ ranked, chosen, target, retry }: {
-  ranked: readonly RankedPlan[]; chosen: RankedPlan; target: LevelId; retry: () => void;
+function Debrief({ ranked, chosen, target, retry, outcomes }: {
+  outcomes: readonly PlanOutcome[]; ranked: readonly RankedPlan[]; chosen: RankedPlan; target: LevelId; retry: () => void;
 }) {
   const [mode, setMode] = useState<'district' | 'optimizer'>('district');
+  const [explored,setExplored] = useState(chosen.outcome);
+  const [replayNumber,setReplayNumber] = useState(0);
+  const replayBaseline = useMemo(()=>simulateReference('geothermal-failure',explored.policy),[explored.policy]);
   const [alternative, setAlternative] = useState('yours');
   const best = ranked[0]!;
   const ties = ranked.filter(plan => plan !== best && plan.score === best.score);
@@ -60,13 +66,18 @@ function Debrief({ ranked, chosen, target, retry }: {
   const { policy, simulation } = chosen.outcome;
   const untreated = useMemo(() => simulateReference('geothermal-failure', policy), [policy]);
   const baseline = useMemo(() => calculateHarm(untreated), [untreated]);
+  const exposed = simulation.harm.levels.filter(l=>l.levelId!==target && l.unsafeHours>0);
+  const worsened = exposed.filter(l=>l.unsafeHours>baseline.levels[l.levelId-1]!.unsafeHours);
   const protectedHours = simulation.harm.levels[target - 1]!.unsafeHours;
   return <>
-    <DistrictSection funded={simulation.snapshots} untreated={untreated} target={target}/>
+    <p className="eyebrow">Replay · {explored.policy} · {allocationText(explored)}</p>
+    <DistrictSection policy={explored.policy} allocation={explored.allocation} key={replayNumber} autoplay={replayNumber>0} funded={explored.simulation.snapshots} untreated={replayBaseline} target={target}/>
+    <PlanSpace player={chosen} selected={explored} outcomes={outcomes} replay={o=>{setExplored(o);setReplayNumber(n=>n+1);}}/>
     <section className="panel debrief-heading"><p className="eyebrow accent">Response debrief · {policy}</p>
       <h2>Level {target} review</h2><p>Your level spent <strong>{protectedHours} of {MODEL.hours} hours</strong> under unsafe conditions. Your allocation was {label(chosen.outcome.allocation)} in ventilation, repairs and redistribution.</p>
+      {protectedHours===0 && exposed.length>0 && <p>Your level stayed safe. Exposure fell on {exposed.map(l=>'level '+l.levelId+' ('+l.unsafeHours+' unsafe hours)').join(', ')}. {worsened.length ? 'Compared with untreated failure, the allocation increased unsafe hours on '+worsened.map(l=>'level '+l.levelId).join(', ')+'.' : 'Each of these levels had equal or greater exposure in the untreated failure.'}</p>}
       <div className="actions"><button aria-pressed={mode === 'district'} onClick={() => setMode('district')}>District impact</button>
-        <button aria-pressed={mode === 'optimizer'} onClick={() => setMode('optimizer')}>Challenge the optimizer</button><button onClick={retry}>Revise response</button></div>
+        <button aria-pressed={mode === 'optimizer'} onClick={() => setMode('optimizer')}>Challenge the optimizer</button><button onClick={retry}>Revise response</button><ResultCard plan={chosen} target={target}/></div>
     </section>
     {mode === 'district' ? <div className="workspace"><section className="panel"><h2>Who gained safe hours?</h2>
       <p className="muted">Unsafe hours across the same failure, with and without your 100 credits.</p>
@@ -100,6 +111,7 @@ export function Challenge() {
   const [ranked, setRanked] = useState<readonly RankedPlan[]>([]);
   const total = fields.reduce((sum, [key]) => sum + draft[key], 0);
   const untreated = useMemo(() => simulateReference('geothermal-failure', policy), [policy]);
+  const preview = useMemo(()=> total===100 ? cache.getOutcomes().find(o=>o.policy===policy && sameAllocation(o.allocation,draft)) : undefined,[cache,policy,draft,total]);
   function commit() {
     if (!target || total !== 100) return;
     const plans = rankPlans(cache.getOutcomes().filter(p => p.policy === policy), 0);
@@ -108,14 +120,15 @@ export function Challenge() {
     window.scrollTo(0, 0);
   }
   return <main id="main-content" className="shell challenge">
-    {chosen && target ? <Debrief ranked={ranked} chosen={chosen} target={target} retry={() => setChosen(null)}/> : <>
-      <DistrictSection key={policy} untreated={untreated} target={target} represent={setTarget}/>
+    {chosen && target ? <Debrief outcomes={cache.getOutcomes()} ranked={ranked} chosen={chosen} target={target} retry={() => setChosen(null)}/> : <>
+      <DistrictSection policy={policy} key={policy} untreated={untreated} target={target} represent={setTarget}/>
       <section className="panel funding" id="fund-response"><h2>Fund your response</h2>
           <p>Allocate 100 emergency credits for the district. {target ? 'You represent level ' + target + '.' : 'Choose the floor you represent in the section above.'}</p>
           <label>Power policy <select value={policy} onChange={e => setPolicy(e.target.value as PowerPolicy)}><option value="equity">Equity · proportional to demand</option><option value="directorate">Directorate · upper levels first</option></select></label>
           {fields.map(([key, title, detail]) => <label key={key} className="budget-row"><span><strong>{title}</strong><small>{detail}</small></span>
             <select aria-label={title} value={draft[key]} onChange={e => setDraft({...draft, [key]: Number(e.target.value)})}>{Array.from({length:11}, (_, i) => <option key={i}>{i * 10}</option>)}</select></label>)}
           <p role="status">{total} / 100 credits · {!target ? 'Choose a level to represent.' : total !== 100 ? 'Allocate exactly 100 to continue.' : 'Ready to commit for level ' + target + '.'}</p>
+          {preview && <p className="preview-result">72-hour draft preview · <strong>{number(preview.simulation.harm.totalUnsafePersonHours)} unsafe resident-hours</strong> · Safe-hours Gini {safeHoursGini(preview.simulation.harm)?.toFixed(3) ?? 'undefined'}. Zero indicates equal safe hours across residents.</p>}
           <button className="primary" disabled={!target || total !== 100} onClick={commit}>Commit response <ArrowRight size={16}/></button></section></>}
   </main>;
 }

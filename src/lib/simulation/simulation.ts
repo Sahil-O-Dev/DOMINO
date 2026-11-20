@@ -25,24 +25,28 @@ export function mapLevels<T>(fn: (level: LevelDefinition, index: number) => T): 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 /** Saturated levels are removed each round; no numerical threshold changes safety rules. */
+const baseDemand = mapLevels(l => l.essentialPowerDemand);
 export function allocatePower(supply: number, weights: FiveLevels<number>): FiveLevels<number> {
+  return allocateDemand(supply, weights, baseDemand);
+}
+function allocateDemand(supply: number, weights: FiveLevels<number>, demand: FiveLevels<number>): FiveLevels<number> {
   if (!Number.isFinite(supply) || supply < 0) throw new RangeError('Supply must be finite and nonnegative.');
   if (weights.length !== 5 || weights.some(w => !Number.isFinite(w) || w <= 0)) {
     throw new RangeError('Five finite positive priority weights are required.');
   }
   const delivered = [0, 0, 0, 0, 0];
   let active = [0, 1, 2, 3, 4];
-  let remaining = Math.min(supply, MODEL.normalPower);
+  let remaining = Math.min(supply, demand.reduce((a,b)=>a+b,0));
   while (active.length && remaining > 0) {
     const weightSum = active.reduce((sum, i) => sum + weights[i]!, 0);
     if (!Number.isFinite(weightSum)) throw new RangeError('Weight sum must be finite.');
-    const capped = active.filter(i => remaining * (weights[i]! / weightSum) >= LEVELS[i]!.essentialPowerDemand);
+    const capped = active.filter(i => remaining * (weights[i]! / weightSum) >= demand[i]!);
     if (!capped.length) {
       for (const i of active) delivered[i] = remaining * (weights[i]! / weightSum);
       break;
     }
     for (const i of capped) {
-      delivered[i] = LEVELS[i]!.essentialPowerDemand;
+      delivered[i] = demand[i]!;
       remaining -= delivered[i]!;
     }
     active = active.filter(i => !capped.includes(i));
@@ -64,6 +68,19 @@ export function simulateReference(scenario: 'normal' | 'geothermal-failure', pol
 
 /** Diagnostic trajectory API allows zero/partial spending; planner validates exact budgets. */
 export function simulateTrajectory(scenario: 'normal' | 'geothermal-failure', policy: PowerPolicy, allocation: ResourceAllocation): readonly HourlySnapshot[] {
+  return computeTrajectory(scenario,policy,allocation);
+}
+
+export interface SampleParameters {
+  cut: number;
+  levels: FiveLevels<{fan:number; repair:number; demand:number; waterRate:number}>;
+}
+
+export function sampledTrajectory(policy:PowerPolicy, allocation:ResourceAllocation, sample:SampleParameters) {
+  return computeTrajectory('geothermal-failure', policy, allocation, sample);
+}
+
+function computeTrajectory(scenario:'normal'|'geothermal-failure', policy:PowerPolicy, allocation:ResourceAllocation, sample?:SampleParameters) {
   const effects = interventionEffects(allocation);
   if (scenario === 'normal' && (allocation.ventilationCredits + allocation.recyclerCredits + allocation.redistributionCredits !== 0)) throw new RangeError('Normal references cannot use interventions.');
   if (scenario !== 'normal' && scenario !== 'geothermal-failure') throw new RangeError('Unknown scenario.');
@@ -73,17 +90,19 @@ export function simulateTrajectory(scenario: 'normal' | 'geothermal-failure', po
     temperatureCelsius: level.baseTemperatureCelsius, waterQuality: MODEL.initialWaterQuality,
     hazards: classifyHazards(level.baseTemperatureCelsius, MODEL.initialWaterQuality, 1) }));
   const snapshots: HourlySnapshot[] = [{ hour: 0, availablePower: MODEL.normalPower, levels, unsafePopulation: 0 }];
-  const supply = scenario === 'normal' ? MODEL.normalPower : MODEL.failedPower;
+  const supply = scenario === 'normal' ? MODEL.normalPower : sample ? MODEL.normalPower * (1-sample.cut) : MODEL.failedPower;
   const weights = mapLevels((_level, i) => (1 - effects.redistributionMix) * BASELINE_WEIGHTS[policy][i]! + effects.redistributionMix * PROTECTIVE_WEIGHTS[i]!);
-  const delivered = allocatePower(supply, weights);
+  const demand = sample ? mapLevels((l,i)=>l.essentialPowerDemand * sample.levels[i]!.demand) : baseDemand;
+  const delivered = allocateDemand(supply, weights, demand);
   for (let hour = 1; hour <= MODEL.hours; hour++) {
     const previous = levels;
     levels = mapLevels((level, i) => {
-      const powerFraction = clamp(delivered[i]! / level.essentialPowerDemand, 0, 1);
-      const targetTemperature = level.baseTemperatureCelsius + MODEL.heatGain * (1 - clamp(powerFraction + effects.fanBonus, 0, 1)) * (1 + MODEL.depthIncrement * i);
+      const powerFraction = clamp(delivered[i]! / demand[i]!, 0, 1);
+      const targetTemperature = level.baseTemperatureCelsius + MODEL.heatGain * (1 - clamp(powerFraction + effects.fanBonus * (sample?.levels[i]!.fan ?? 1), 0, 1)) * (1 + MODEL.depthIncrement * i);
       const temperatureCelsius = previous[i]!.temperatureCelsius + MODEL.temperatureResponse * (targetTemperature - previous[i]!.temperatureCelsius);
-      const targetQuality = clamp(MODEL.initialWaterQuality - MODEL.waterPowerPenalty * (1 - powerFraction) - MODEL.waterHeatPenalty * Math.max(0, temperatureCelsius - MODEL.waterHeatThreshold) + (hour >= INTERVENTIONS.repairStartHour ? effects.repairBonus : 0), 0, 100);
-      const waterQuality = clamp(previous[i]!.waterQuality + MODEL.waterResponse * (targetQuality - previous[i]!.waterQuality), 0, 100);
+      const targetQuality = clamp(MODEL.initialWaterQuality - MODEL.waterPowerPenalty * (1 - powerFraction) - MODEL.waterHeatPenalty * Math.max(0, temperatureCelsius - MODEL.waterHeatThreshold) + (hour >= INTERVENTIONS.repairStartHour ? effects.repairBonus * (sample?.levels[i]!.repair ?? 1) : 0), 0, 100);
+      const response = sample && targetQuality < previous[i]!.waterQuality ? Math.min(1,MODEL.waterResponse * sample.levels[i]!.waterRate) : MODEL.waterResponse;
+      const waterQuality = clamp(previous[i]!.waterQuality + response * (targetQuality - previous[i]!.waterQuality), 0, 100);
       return { levelId: level.id, deliveredPower: delivered[i]!, powerFraction, temperatureCelsius, waterQuality,
         hazards: classifyHazards(temperatureCelsius, waterQuality, powerFraction) };
     });

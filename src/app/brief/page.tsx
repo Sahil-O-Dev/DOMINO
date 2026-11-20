@@ -22,5 +22,10 @@ export default async function Home() {
       <div><Zap/><span>Supply after failure<strong>{MODEL.failedPower} / {MODEL.normalPower} units</strong></span></div>
     </div>
     <section className="brief" id="scenario"><h2>Scenario brief</h2><p>Trigger a geothermal failure and inspect power, heat and water quality across the district. Allocate 100 emergency credits, then compare how two power policies distribute exposure over {MODEL.hours} hours.</p></section>
+    <section className="visual-panel"><h2>Model assumptions</h2>
+      <p>Residents stay on their starting level and share its conditions. Demand and population stay fixed. Hour 0 starts at full supply. The geothermal outage begins at hour 1 and lasts through hour {MODEL.hours}.</p>
+      <p>Both policies distribute the same finite supply. Ventilation changes cooling efficiency, recycler repairs affect water from hour 25, and redistribution changes the priority weights. Each hour’s temperature feeds that hour’s water update.</p>
+      <p>A resident counts once per unsafe hour if temperature exceeds {MODEL.unsafeTemperature} °C, water falls below {MODEL.unsafeWater}, or essential power falls below {MODEL.unsafePower*100}%. Exposure is measured in resident-hours. The thresholds and water index are fictional. The baseline uses fixed inputs. The optional illustrative layer samples 500 alternative runs and reports synthetic health ranges. Its assumptions and coefficients are listed beside the results.</p>
+    </section>
   </main>;
 }

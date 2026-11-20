@@ -16,6 +16,9 @@ Verification: all 36 existing tests passed in 5 files; Next.js production build 
 
 ## Current snapshot
 
+- Implemented visual diagnostics, 66-plan scatter/replay for either policy, live budget/equity preview, and the approved illustrative uncertainty and health layer. The local production build, strict type check and 45 Vitest tests in 9 files passed. The original 40 checks are intact. Additional tests cover weighted Gini, reproducibility, zero/monotone risk, illustrative calibration and baseline coverage of the untreated Equity level-5 endpoint. Coverage at other points is empirical.
+- Local Chrome checks passed 360 heat cells, synced level/hour selection, split overlays, flow bands, cross-policy replay, PNG card download, opt-in health ranges and assumptions, plus a 375 px layout. A server-rendered SVG tooltip mismatch found in the first walkthrough was corrected and rechecked. Owner to review the expanded visuals; Windows verification remains with the teammate.
+
 - Implemented the five-floor cutaway on the homepage and guest challenge. Local Chrome walkthrough passed at 1280 px and 375 px, including the first-hazard pause, playback, selection, funding and same-hour comparison. All 40 Vitest tests, strict type checking and production build passed. Owner to review the new Stage 5 presentation.
 
 - The guest challenge at `/challenge` now offers level selection, exact-budget commitment, all-level impact versus untreated failure, hourly inspection, and comparisons with the optimizer and alternative exact-score winners. Verified 40/40 Vitest tests, strict type checking and production build. A 375 px Chrome walkthrough passed guest entry, invalid-budget blocking, first safety difference, keyboard scrubbing, revision, both policies and tied/unique winner handling. Project owner to review the challenge before Stage 6.

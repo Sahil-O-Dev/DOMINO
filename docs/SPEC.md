@@ -147,3 +147,9 @@ Findings:
 - If a winner that changes with fairness is essential, request a separate model-design stage. One specific candidate is replacing binary per-hour harm with graded exposure `population_i * (max(0,(T_i-32)/8) + max(0,(70-Q_i)/65) + max(0,(0.60-p_i)/0.60))`, and deriving H and D from those values. Denominators use existing scales, but this changes units, removes the union-based person-hour interpretation, and needs new names, tests, calibration, and approval. It is not part of this SPEC and does not guarantee a ranking crossover. Prefer retaining the current MVP over this scope expansion.
 
 No amendment is authorized by its appearance here. Record any approval in DECISIONS before changing this specification or implementing a revised model.
+
+## Approved optional illustrative layer
+
+The baseline equations and rankings above continue to define the challenge. For the optional layer only, sample a shared triangular outage (25%, 30% mode, 38%) and independent level-specific multipliers once per run. Scale the fan bonus by clipped Normal(1,0.08) in [0.75,1.15], repair bonus by clipped Normal(1,0.15) in [0.6,1.3], essential demand by Uniform(0.95,1.05), and the downward water response rate by Lognormal(median 1, log sigma 0.2), capped at full adjustment. Population and allocation priorities stay fixed.
+
+Accumulate degree-hours above 32°C, water-index-point-hours below 70 and effective-cooling-fraction-hours below 0.60 (illustrative ventilation proxy, observed 12 hours later). Use population × (1 − exp(−cumulative hazard)) for each pathway and for combined hazard. The config scales each pathway to 10% risk at its documented reference excess. These fictional outcomes have no clinical validation. Report empirical P10–P90 across 500 seeded simulations. Threshold nonlinearities and the asymmetric outage distribution mean baseline coverage is not guaranteed.
