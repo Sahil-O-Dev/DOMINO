@@ -16,6 +16,8 @@ Verification: all 36 existing tests passed in 5 files; Next.js production build 
 
 ## Current snapshot
 
+- Implemented the five-floor cutaway on the homepage and guest challenge. Local Chrome walkthrough passed at 1280 px and 375 px, including the first-hazard pause, playback, selection, funding and same-hour comparison. All 40 Vitest tests, strict type checking and production build passed. Owner to review the new Stage 5 presentation.
+
 - The guest challenge at `/challenge` now offers level selection, exact-budget commitment, all-level impact versus untreated failure, hourly inspection, and comparisons with the optimizer and alternative exact-score winners. Verified 40/40 Vitest tests, strict type checking and production build. A 375 px Chrome walkthrough passed guest entry, invalid-budget blocking, first safety difference, keyboard scrubbing, revision, both policies and tied/unique winner handling. Project owner to review the challenge before Stage 6.
 
 

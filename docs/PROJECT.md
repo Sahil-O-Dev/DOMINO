@@ -72,6 +72,8 @@ Use Node 22.14.0 and npm 11.3.0 as the team baseline, with a committed npm lockf
 
 ### Stage 5 dashboard
 
+The homepage and guest challenge render the interactive architectural section. Five selectable floor overlays use the selected snapshot for power shading and hazard labels. Playback pauses at the first unsafe snapshot. Funded and untreated runs share a single inspection hour and floor. The scenario introduction is at /brief and Inspect data opens the account-protected dashboard.
+
 The public challenge at `/challenge` uses the existing client-side simulation and ranking cache. The player commits to a level, policy and allocation before seeing results. District impact compares with the zero-spend failure. The optimizer comparison holds policy and budget fixed and uses a fairness weight of zero. The full dashboard retains its adjustable fairness control and account gate.
 
 
