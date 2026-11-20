@@ -72,6 +72,9 @@ Use Node 22.14.0 and npm 11.3.0 as the team baseline, with a committed npm lockf
 
 ### Stage 5 dashboard
 
+The public challenge at `/challenge` uses the existing client-side simulation and ranking cache. The player commits to a level, policy and allocation before seeing results. District impact compares with the zero-spend failure. The optimizer comparison holds policy and budget fixed and uses a fairness weight of zero. The full dashboard retains its adjustable fairness control and account gate.
+
+
 App owns policy, selected hour, disaster state, draft/applied allocation, and lambda. Cached outcomes drive rankings; the selected trajectory drives cards, levels and Recharts data. Current-hour indicators and full-horizon harm are labeled separately. Zero-spend reference comparisons are explicit. Native controls provide keyboard affordances, with responsive CSS and horizontally scrollable comparison tables. See PROGRESS for interaction and responsive verification.
 
 ### Next.js migration

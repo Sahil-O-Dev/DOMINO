@@ -12,7 +12,7 @@ export default async function Home() {
         <p className="eyebrow accent">DOMINO / Infrastructure simulator</p>
         <h1 id="cover-title">The Hollow<span>.</span></h1>
         <p>A fictional district built below ground. When geothermal power fails, how will you keep its residents safe?</p>
-        <div className="actions"><Link className="primary" href={user ? '/domino' : '/auth/login'}>Open simulator <ArrowRight size={17}/></Link><a href="#scenario" className="text-link">Scenario brief <ArrowDown size={15}/></a></div>
+        <div className="actions"><Link className="primary" href="/challenge">Play the challenge <ArrowRight size={17}/></Link><Link className="text-link" href={user ? '/domino' : '/auth/login'}>Open simulator <ArrowRight size={17}/></Link><a href="#scenario" className="text-link">Scenario brief <ArrowDown size={15}/></a></div>
       </div>
     </section>
     <div className="spec-strip" aria-label="Scenario parameters">

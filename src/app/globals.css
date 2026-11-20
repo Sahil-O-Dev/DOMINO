@@ -145,3 +145,21 @@ footer { padding: 22px 0 0; font-size: .8rem; }
   .section-nav { font-size: .8rem; }
   .chart { height: 215px; }
 }
+
+.challenge { padding-bottom: 32px; }
+.challenge-intro { padding: clamp(28px, 5vw, 60px); margin: 24px 0; border: 1px solid var(--line); border-radius: 8px; background: linear-gradient(90deg,#101b15f7,#101b15e5 55%,#101b1580), url('/the-hollow.webp') center 45% / cover; }
+.challenge-intro > p:not(.eyebrow) { max-width: 62ch; line-height: 1.65; }
+.level-picks { display: grid; gap: 8px; }
+.level-picks button { justify-content: flex-start; min-height: 48px; }
+.level-picks span { margin-left: auto; color: var(--muted); }
+.challenge button[aria-pressed=true] { border-color: var(--accent); background: #413327; }
+.challenge select { max-width: 100%; }
+.challenge .budget-row small { display: block; color: var(--muted); }
+.replay { display: grid; gap: 12px; }
+.replay h3 { font-size: .88rem; }
+.hour-strip { display: flex; gap: 1px; margin-top: 6px; background: var(--bg); }
+.hour-strip i { height: 18px; flex: 1; background: var(--sage); }
+.hour-strip .hazard { background: repeating-linear-gradient(135deg,#edb280 0 4px,#815531 4px 6px); }
+.reading-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.reading-pair article { background: var(--bg); padding: 12px; border-radius: 5px; line-height: 1.55; }
+.reading-pair article strong { color: var(--accent); }

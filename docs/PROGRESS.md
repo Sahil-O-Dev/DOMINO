@@ -16,6 +16,9 @@ Verification: all 36 existing tests passed in 5 files; Next.js production build 
 
 ## Current snapshot
 
+- The guest challenge at `/challenge` now offers level selection, exact-budget commitment, all-level impact versus untreated failure, hourly inspection, and comparisons with the optimizer and alternative exact-score winners. Verified 40/40 Vitest tests, strict type checking and production build. A 375 px Chrome walkthrough passed guest entry, invalid-budget blocking, first safety difference, keyboard scrubbing, revision, both policies and tied/unique winner handling. Project owner to review the challenge before Stage 6.
+
+
 - Stage 5 is ready for owner review on macOS. The DAYLIGHT landing page and account screens now lead into a protected DOMINO dashboard. See [PROJECT.md](PROJECT.md) for the account boundary and [README.md](../README.md) for local setup.
 - The dashboard now groups the four chart metrics in a keyboard-operable selector, labels the selected hour and full-horizon exposure, shows the applied draft and score, and resets the scenario, policy, fairness weight and credit controls together.
 - On Node 22.14.0 with npm 11.3.0, `npm test` passed **40 tests in 7 files**. `npm run typecheck` and `npm run build` passed. Node reports an experimental-feature notice for its built-in SQLite driver. Authentication tests cover persistence across database reopens, duplicate accounts, credential rejection, expiring sessions and sign-out. The chart adapter test checks all five levels at every hour.
