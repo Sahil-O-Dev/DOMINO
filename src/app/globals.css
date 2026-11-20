@@ -257,8 +257,7 @@ button.section-floor { background: transparent; }
 .dispatch-feed strong {font-size:1.5rem;}
 .field-line {align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:10px;}
 .field-window { height:clamp(85px,12vw,150px);margin-bottom:18px;border:1px solid var(--line);border-radius:4px;background:#1c211b url('/district-section.webp') center bottom / 100% 500% no-repeat; }
-.advisor-chat textarea {width:100%;max-width:48rem;display:block;margin:8px 0 12px;padding:12px;resize:vertical;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:6px;font:inherit;}
-.advisor-chat [role=log] p {white-space:pre-wrap;line-height:1.6;}
+.advisor-briefing p {white-space:pre-wrap;line-height:1.6;}
 
 .attempt-comparison { margin-block: 1.25rem; padding-block: 1.25rem .25rem; border-block: 1px solid var(--line); }
 .floor-changes { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin-block: .5rem; }

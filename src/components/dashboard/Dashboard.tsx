@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AdvisorChat } from "./AdvisorChat";
+import { AdvisorBriefing } from "./AdvisorBriefing";
 import { Trajectories } from "./Trajectories";
 import { Activity, RotateCcw } from "lucide-react";
 import {
@@ -465,14 +465,12 @@ export function Dashboard() {
           })}
         </div>
       </section>
-      {/* Added AI advisor: original dashboard sections above remain unchanged. */}
       <section className="panel" id="ai-advisor">
-        
         <h2>DOMINO AI Advisor</h2>
         <p className="muted">
-          Ask about the district or your response plan. Gemini receives your question, recent conversation, and simulation summary.
+          Get a short briefing from Gemini on the current simulation and what to try next.
         </p>
-        <AdvisorChat key={JSON.stringify([failure,policy,allocation,lambda])} context={{
+        <AdvisorBriefing key={JSON.stringify([failure,policy,allocation,lambda])} context={{
           scenario: failure ? 'geothermal-failure' : 'normal', policy, allocation,
           before: untreatedHarm, after: harm, fairnessWeight: lambda,
           bestPlan: {allocation: winner.outcome.allocation, harm: winner.outcome.simulation.harm},
@@ -517,7 +515,7 @@ export function Dashboard() {
         ) : (
           <p className="muted">
             Trigger geothermal failure and apply a 100-credit allocation to see
-            the before-and-after comparison. You can ask questions now.
+            the before-and-after comparison.
           </p>
         )}
       </section>

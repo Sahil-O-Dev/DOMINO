@@ -9,5 +9,7 @@ describe('dashboard', () => {
     expect(html).toContain('id="district"');
     expect(html).toContain('DOMINO');
     expect(html).toContain('Ranked response plans');
+    expect(html).toContain('Explain this scenario');
+    expect(html).not.toContain('<textarea');
   });
 });

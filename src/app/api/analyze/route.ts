@@ -79,7 +79,7 @@ IMPORTANT RULES:
     const result=await response.json();
     const parts=result.candidates?.[0]?.content?.parts ?? [];
     const explanation=parts.filter((p:{text?:string;thought?:boolean})=>!p.thought && typeof p.text==='string').map((p:{text:string})=>p.text).join('').trim();
-    if(!explanation)return Response.json({error:'Gemini returned no answer. Try rephrasing the question.'},{status:502});
+    if(!explanation)return Response.json({error:'Gemini returned no explanation. Please retry.'},{status:502});
     return Response.json({explanation});
   } catch (error) {
     const timedOut=error instanceof Error && error.name==='TimeoutError';

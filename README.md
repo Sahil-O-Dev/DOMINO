@@ -85,4 +85,4 @@ Open `/handoff` for the Level 5 operator/resident briefing. After the reveal, bo
 
 ## Gemini advisor
 
-Sign in and open **AI Advisor** in the dashboard. Type a question and choose **Send question**, or apply a plan and choose **Analyze my plan**. Set `GEMINI_API_KEY` in the server environment or in the ignored `.env.local` file at the project root and restart Next.js. The server calls Gemini with the selected scenario summary. Simulation and rankings still work offline after loading.
+Sign in and open **AI Advisor** in the dashboard. Choose **Explain this scenario** for a briefing, or apply a plan and choose **Analyze my plan** to review its impact. Set `GEMINI_API_KEY` in the server environment or in the ignored `.env.local` file at the project root and restart Next.js. The server calls Gemini with the selected scenario summary. Simulation and rankings still work offline after loading.
