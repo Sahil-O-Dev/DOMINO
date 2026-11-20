@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { LEVELS, MODEL } from '../../lib/simulation/simulation';
 import type { HourlySnapshot } from '../../lib/simulation/types';
+import { PanelExplain } from '../PanelExplain';
+import { displayNumber } from '../../lib/simulation/readings';
 import { chartData } from './chart-data';
 
 const metrics = [
@@ -16,12 +18,17 @@ const compact = new Intl.NumberFormat('en', { notation: 'compact', maximumFracti
 export function Trajectories({ snapshots, hour }: { snapshots: readonly HourlySnapshot[]; hour: number }) {
   const [metric, setMetric] = useState(metrics[0]!);
   const points = useMemo(() => chartData(snapshots), [snapshots]);
+  const current = points[hour]!;
+  const reading = metric.key === 'unsafe'
+    ? `At hour ${hour}, ${displayNumber(current.unsafe!)} residents are on unsafe floors. The district total peaks at ${displayNumber(Math.max(...points.map(p => p.unsafe!)))} during the run. This line counts people at each hour.`
+    : `At hour ${hour}, ${metric.name.toLowerCase()} across levels 1 through 5 is ${LEVELS.map(l => displayNumber(current[metric.key + l.id]!)).join(', ')} (${metric.unit}). Each line follows one level over time. ${metric.key === 't' ? 'Higher values mean hotter conditions.' : 'Lower values mean worse conditions.'}`;
   return <section className="panel plot-panel" aria-label="Hourly trajectories">
     <p className="eyebrow">Full simulation</p><h2>Hourly trajectories</h2>
     <div className="metric-picker" role="group" aria-label="Chart metric">{metrics.map(m =>
       <button key={m.key} aria-pressed={m.key === metric.key} onClick={() => setMetric(m)}>{m.name}</button>
     )}</div>
     <h3 className="chart-title">{metric.name} · {metric.unit}</h3>
+    <PanelExplain title={metric.name + " chart"} reading={reading}/>
     <div className="chart"><ResponsiveContainer width="100%" height="100%" initialDimension={{width: 430, height: 250}}>
       <LineChart data={points} margin={{ left: 0, right: 12, top: 10, bottom: 0 }}>
         <CartesianGrid stroke="#34413c" strokeDasharray="3 5" vertical={false}/>

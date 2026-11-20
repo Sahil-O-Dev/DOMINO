@@ -1,3 +1,4 @@
+import { PanelExplain } from '../PanelExplain';
 import { useMemo, useState } from 'react';
 import { safeHoursGini } from '../../lib/simulation/equity';
 import { rankPlans } from '../../lib/simulation/ranking';
@@ -17,6 +18,7 @@ export function PlanSpace({ outcomes, player, selected, replay }: {outcomes: rea
   return <section className="visual-panel"><h2>Allocation space</h2>
     <label>Explore policy <select value={policy} onChange={e=>setPolicy(e.target.value as typeof policy)}><option value="equity">Equity</option><option value="directorate">Directorate</option></select></label>
     <p>{points.length} plans · Lower left combines lower exposure with more evenly distributed safe hours. Select a point to load its replay. Plans at identical coordinates share a point.</p>
+    <PanelExplain title="allocation space" reading={`Under ${policy}, the lowest exposure among ${points.length} plans is ${best.simulation.harm.totalUnsafePersonHours.toLocaleString('en-US')} unsafe resident-hours. Moving left means less exposure and moving down means safe hours are distributed more evenly. The replay uses ${allocationText(selected)} under ${selected.policy}.`}/>
     <svg className="allocation-plot" viewBox="0 0 475 212" aria-label="Total unsafe resident-hours against population-weighted safe-hours Gini">
       <path d="M50 25 V172 H444" fill="none" stroke="#87988d"/>
       <g fill="#cfdbd0" fontSize="10"><text x="4" y="15">Safe-hours Gini</text><text x="10" y="32">{height.toFixed(2)}</text><text x="30" y="174">0</text><text x="48" y="189">0</text><text x="444" y="189" textAnchor="end">{(max/1e6).toFixed(1)}M</text><text x="245" y="207" textAnchor="middle">Unsafe resident-hours</text></g>

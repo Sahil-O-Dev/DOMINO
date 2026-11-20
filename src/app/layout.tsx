@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Layers3, LogOut } from 'lucide-react';
 import { currentUser } from '../lib/auth/session';
 import { signOut } from '../lib/auth/actions';
+import { AdvisorProvider } from '../components/PanelExplain';
 import './globals.css';
 
 export const metadata: Metadata = { title: 'DAYLIGHT / DOMINO', description: 'Explore infrastructure and emergency response in the fictional Hollow district.' };
@@ -19,6 +20,6 @@ export default async function RootLayout({ children }: { readonly children: Reac
         {user ? <><Link href="/domino">Simulator</Link><span className="operator">{user.name}</span><form action={signOut}><button className="quiet"><LogOut size={15} /> Sign out</button></form></>
           : <><Link href="/auth/login">Sign in</Link><Link className="outline-link" href="/auth/signup">Create account</Link></>}
       </div>
-    </nav></header>{children}
+    </nav></header><AdvisorProvider available={Boolean(user)}>{children}</AdvisorProvider>
   </body></html>;
 }

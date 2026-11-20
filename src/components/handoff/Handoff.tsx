@@ -1,5 +1,7 @@
 'use client';
 
+import { PanelExplain } from '../PanelExplain';
+import { budgetReading } from '../../lib/simulation/readings';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { currentPost, channels, incident, names, report } from '../../lib/handoff/incident';
@@ -25,6 +27,7 @@ function Reveal({decision,data,restart,next,nextLabel,waiting}:{decision:Decisio
     <h2>You identified {correct} of 3 conditions correctly.</h2><p>The Directorate displayed rounded readings from hour {data.sampleHour}. The resident observed hour {data.briefingHour}.</p>
     <div className="table-wrap"><table><thead><tr><th>Condition</th><th>Official feed</th><th>Your assessment</th><th>At the scene</th></tr></thead>
     <tbody>{channels.map(k=><tr key={k}><th>{names[k]}</th>{[data.feedFlags[k],decision.belief[k],data.actual.hazards[k]].map((unsafe,i)=><td key={i}>{unsafe?'Unsafe':'Safe'}</td>)}</tr>)}</tbody></table></div>
+    <PanelExplain title="after-action review" reading={`Your assessment matched ${correct} of three observed conditions on level ${data.levelId}. The last official sample came from hour ${data.sampleHour}, while the resident saw hour ${data.briefingHour}. The time gap matters when conditions change between readings.`}/>
     <h3>What your response would change</h3><p>Replaying the outage with your plan from hour 1 gives Level {data.levelId} <strong>{harm.levels[data.levelId-1]!.unsafeHours} unsafe hours</strong>, compared with {before.levels[data.levelId-1]!.unsafeHours} untreated. This is a counterfactual replay of the full 72 hours.</p>
     <p>District exposure · {harm.totalUnsafePersonHours.toLocaleString('en-US')} unsafe resident-hours. Safe-hours inequality · {safeHoursGini(harm)?.toFixed(3)??'undefined'} Gini (zero means equal safe hours).</p>
     <div className="actions">{next && <button className="primary" disabled={waiting} onClick={next}>{waiting?'Waiting for the other post…':nextLabel}</button>}<button onClick={restart}>Return to mode selection</button></div></section>
@@ -107,16 +110,19 @@ export function Handoff(){
       waiting={busy||Boolean(ticket&&room.ready.includes(ticket.role))}/>:resident?<section className="panel field-post"><p className="eyebrow">Resident post · Current hour {data.briefingHour}</p>
       <div className="field-window" style={{backgroundPosition:'center '+((data.levelId-1)*25)+'%'}} role="img" aria-label={'District level '+data.levelId}/><h2>Report from Level {data.levelId}</h2><p>Choose the observations to hand to the operator. You can also describe them aloud.</p>
       {channels.map(k=><div key={k} className="field-line"><p>{report(k,data)}</p><button disabled={busy||sent.includes(k)} onClick={()=>dispatch(k)}>{sent.includes(k)?'Sent':'Send '+names[k]}</button></div>)}
+      <PanelExplain title="field observations" reading={`At hour ${data.briefingHour} on level ${data.levelId}, the current field reports say: ${channels.map(k => report(k,data)).join(' ')} Select an observation to share it with the operator.`}/>
       {!paired&&<button className="primary" onClick={()=>setSeat('pass')}>Cover readings and pass device</button>}
     </section>:mode==='hot-seat'&&seat==='pass'?<section className="panel"><h2>Pass to the operator</h2><p>The resident’s screen is covered.</p><button className="primary" onClick={()=>setSeat('operator')}>Open control room</button></section>:
     <section className="panel"><p className="eyebrow">Directorate control room · Hour {data.briefingHour}</p><h2>Assess Level {data.levelId}</h2>
       <p>Last official sample · hour {data.sampleHour}. Flag each condition you believe is unsafe now.</p>
       <div className="dispatch-feed">{channels.map(k=><label key={k}><span>{names[k]}</span><strong>{data.official[k]}{k==='heat'?' °C':k==='power'?'%':' / 100'}</strong><small>Unsafe {k==='heat'?'above '+MODEL.unsafeTemperature+' °C':k==='water'?'below '+MODEL.unsafeWater:'below '+(MODEL.unsafePower*100)+'%'}</small><span><input type="checkbox" checked={draft.belief[k]} onChange={e=>setDraft({...draft,belief:{...draft.belief,[k]:e.target.checked}})}/> Flag unsafe</span></label>)}</div>
+      <PanelExplain title="official feed" reading={`At hour ${data.briefingHour}, the newest official sample for level ${data.levelId} is from hour ${data.sampleHour}: ${data.official.heat} °C, water quality ${data.official.water}/100 and ${data.official.power}% power. The readings describe the sample hour. A resident dispatch can help you assess conditions now.`}/>
       <h3>Resident dispatches</h3>
       {mode==='solo'&&<div className="actions">{channels.map(k=><button key={k} disabled={sent.includes(k)} onClick={()=>dispatch(k)}>Ask about {names[k].toLowerCase()}</button>)}</div>}
       <div aria-live="polite">{sent.length?sent.map(k=><p key={k}>{report(k,data)}</p>):<p>No field reports received.</p>}</div>
       <h3>Authorize a 100-credit response</h3><p>Your plan will be evaluated as if it had been in place at the start of the outage.</p>
       {fields.map(([key,name])=><label className="budget-row" key={key}>{name}<select value={draft.allocation[key]} onChange={e=>setDraft({...draft,allocation:{...draft.allocation,[key]:Number(e.target.value)}})}>{Array.from({length:11},(_,i)=><option key={i}>{i*10}</option>)}</select></label>)}
+      <PanelExplain title="handoff allocation" reading={budgetReading(draft.allocation)}/>
       <p role="status">{total} / 100 credits</p><button className="primary" disabled={total!==100||busy||(paired&&!room.joined)} onClick={()=>{
         if(ticket)void request(async()=>acceptView(await submitDecision(ticket,draft,round)));else setDecision(draft);
       }}>Commit assessment and plan</button>

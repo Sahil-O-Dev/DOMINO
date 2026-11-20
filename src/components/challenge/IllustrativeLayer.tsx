@@ -1,3 +1,4 @@
+import { PanelExplain } from '../PanelExplain';
 import { useMemo, useState } from 'react';
 import { illustrate } from '../../lib/simulation/illustrative';
 import { ILLUSTRATION as C } from '../../lib/simulation/illustrative-config';
@@ -21,6 +22,7 @@ function Ensemble({series,policy,allocation,floor,hour,inspect}:Props) {
   const ribbon=row.map((c,i)=>[x(i),y(c.hi)].join(',')).concat(row.map((c,i)=>[x(i),y(c.lo)].join(',')).reverse()).join(' ');
   return <>
     <h3>Level {floor} · cumulative safe hours</h3>
+    <PanelExplain title="safe-hour uncertainty" onOpen={() => inspect(floor, hour)} reading={`By hour ${hour}, level ${floor} has accumulated ${safe[hour]} safe hours in the deterministic run. The middle 80% of illustrative runs span ${endpoints(row[hour]!)} safe hours. ${(row[hour]!.probability*100).toFixed(1)}% of runs are unsafe on this floor at this particular hour.`}/>
     <svg viewBox="0 0 470 187" className="allocation-plot" role="img" aria-label="Deterministic cumulative safe hours and simulated P10 to P90 band">
       <path d="M38 17V158H448" fill="none" stroke="#a3b5a7"/><polygon fill="#659e96" points={ribbon}/>
       <polyline fill="none" stroke="#f1d3ab" strokeWidth="2.5" points={safe.map((v,i)=>[x(i),y(v)].join(',')).join(' ')}/>
@@ -36,6 +38,7 @@ function Ensemble({series,policy,allocation,floor,hour,inspect}:Props) {
       <span>{(cells[hour]!.probability*100).toFixed(1)}% unsafe</span></div>)}
     <h3>Illustrative cases over {MODEL.hours} hours</h3>
     <label>Pathway <select value={path} onChange={e=>setPath(e.target.value as typeof path)}><option value="combined">Any modeled pathway</option><option value="heat">Heat stress</option><option value="water">Waterborne illness</option><option value="respiratory">Respiratory</option></select></label>
+    <PanelExplain title="illustrative health outcomes" reading={`For level ${floor}, the middle 80% of sampled 72-hour estimates span ${endpoints(results.cases[floor-1]![path])} cases for the ${path} pathway. The range comes from fictional exposure assumptions and cannot predict actual illness.`}/>
     <div className="table-wrap"><table><thead><tr><th>Residents</th><th>Cases / 100,000 · P10–P90</th><th>Estimated cases · P10–P90</th></tr></thead><tbody>
     {results.cases.map((r,i)=>{
       const level=LEVELS[i],pop=level?.population??LEVELS.reduce((s,l)=>s+l.population,0);

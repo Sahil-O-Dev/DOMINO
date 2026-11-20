@@ -1,3 +1,5 @@
+import { PanelExplain } from '../PanelExplain';
+import { floorReading } from '../../lib/simulation/readings';
 import { useState } from 'react';
 import { LEVELS, MODEL, isUnsafe } from '../../lib/simulation/simulation';
 import type { HourlySnapshot, LevelId } from '../../lib/simulation/types';
@@ -30,7 +32,8 @@ export function Replay({ a, b, names, target, initialHour = MODEL.hours }: {
       const reading = series[hour]!.levels[index]!;
       const hazards = [reading.hazards.heat && 'heat', reading.hazards.water && 'water', reading.hazards.power && 'power'].filter(Boolean);
       return <article key={i}><h3>{names[i]}</h3><strong>{hazards.length ? 'Unsafe · ' + hazards.join(', ') : 'Safe'}</strong>
-        <p>{number(reading.temperatureCelsius)} °C<br/>Water {number(reading.waterQuality)} / 100<br/>Power {number(reading.powerFraction * 100)}%</p></article>;
+        <p>{number(reading.temperatureCelsius)} °C<br/>Water {number(reading.waterQuality)} / 100<br/>Power {number(reading.powerFraction * 100)}%</p>
+        <PanelExplain title={names[i] + ' replay'} reading={names[i] + '. ' + floorReading(reading, hour)}/></article>;
     })}</div>
     <p className="footnote">Modeled hazards begin above {MODEL.unsafeTemperature} °C, below water index {MODEL.unsafeWater}, or below {number(MODEL.unsafePower * 100)}% essential power. Readings are rounded for display.</p>
   </div>;

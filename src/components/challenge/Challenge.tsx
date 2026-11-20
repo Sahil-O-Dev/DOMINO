@@ -1,5 +1,7 @@
 'use client';
 
+import { PanelExplain } from '../PanelExplain';
+import { budgetReading } from '../../lib/simulation/readings';
 import { useMemo, useState } from 'react';
 import { AttemptComparison } from './AttemptComparison';
 import { Replay } from './Replay';
@@ -46,6 +48,7 @@ function Debrief({ ranked, chosen, previous, target, retry, outcomes }: {
       <p>{gain > 0 ? 'Your plan gave residents here '+gain+' more safe hours than the untreated outage.' : gain < 0 ? 'Residents here lost '+(-gain)+' safe hours compared with the untreated outage.' : 'Residents here had the same number of safe hours as in the untreated outage.'}
         {' '}{worsened.length > 0 ? 'Unsafe hours increased on '+worsened.map(l=>'level '+l.levelId).join(', ')+'.' :
         exposed.length > 0 ? 'Elsewhere, '+exposed.map(l=>'level '+l.levelId).join(', ')+' still experienced unsafe conditions.' : 'All other levels stayed safe.'}</p>
+      <PanelExplain title="response debrief" reading={`Across 72 hours, level ${target} has ${protectedHours} unsafe hours with your plan and ${baseline.levels[target-1]!.unsafeHours} without it. ${exposed.length ? 'Other levels with unsafe hours: ' + exposed.map(l => l.levelId).join(', ') + '.' : 'All other levels remain safe.'}`}/>
       {previous && <AttemptComparison previous={previous} current={chosen.outcome} target={target}/>}
       <div className="actions"><button className="primary" onClick={retry}>Try another response</button><ResultCard plan={chosen} target={target}/></div>
     </section>
@@ -55,6 +58,7 @@ function Debrief({ ranked, chosen, previous, target, retry, outcomes }: {
       <div className="actions"><button aria-pressed={mode === 'district'} onClick={() => setMode('district')}>District impact</button>
         <button aria-pressed={mode === 'optimizer'} onClick={() => setMode('optimizer')}>Challenge the optimizer</button></div>
     {mode === 'district' ? <div className="workspace"><section className="panel"><h2>Who gained safe hours?</h2>
+      <PanelExplain title="safe hours gained" reading={`Changes in safe hours from the untreated outage, from level 1 to 5: ${simulation.harm.levels.map((l,i) => baseline.levels[i]!.unsafeHours - l.unsafeHours).join(', ')}. A negative change means residents on that floor spend more time exposed under the plan.`}/>
       <p className="muted">Unsafe hours across the same failure, with and without your 100 credits.</p>
       <div className="table-wrap"><table><thead><tr><th>Level</th><th>Untreated</th><th>Your plan</th><th>Safe hours gained</th></tr></thead>
         <tbody>{simulation.harm.levels.map((l, i) => {
@@ -64,6 +68,7 @@ function Debrief({ ranked, chosen, previous, target, retry, outcomes }: {
         })}</tbody></table></div><p>District exposure · <strong>{number(simulation.harm.totalUnsafePersonHours)} person-hours</strong></p>
       </section><section className="panel"><h2>Inspect the replay</h2><Replay a={simulation.snapshots} b={untreated} target={target} names={['Your plan', 'Untreated failure']}/></section></div>
     : <div className="workspace"><section className="panel"><h2>Can you match the best plan?</h2>
+      <PanelExplain title="optimizer comparison" reading={`Your response scores ${number(chosen.score)} unsafe person-hours under ${policy}. The best of ${ranked.length} allocations scores ${number(best.score)}. The gap measures extra time residents collectively spend in unsafe conditions.`}/>
       <p className="muted">The optimizer ranks all {ranked.length} allocations under the {policy} policy by total unsafe person-hours. The deep-level fairness weight is zero for this challenge.</p>
       <p>Your score · <strong>{number(chosen.score)}</strong><br/>Best score · <strong>{number(best.score)}</strong></p>
       <p>{chosen.score === best.score ? 'You matched the lowest score.' : 'Your plan adds ' + number(chosen.score - best.score) + ' unsafe person-hours over the best score.'}</p>
@@ -110,6 +115,7 @@ export function Challenge() {
       <section className="panel funding" id="fund-response"><h2>Fund your response</h2>
           <p>Allocate 100 emergency credits for the district. {target ? 'You represent level ' + target + '.' : 'Choose the floor you represent in the section above.'}</p>
           {previous && <p className="footnote">When you commit, you’ll see how this response compares with your last one.</p>}
+          <PanelExplain title="response budget" reading={budgetReading(draft) + (preview ? ' Under ' + policy + ', this draft produces ' + number(preview.simulation.harm.totalUnsafePersonHours) + ' unsafe resident-hours.' : '')}/>
           <label>Power policy <select value={policy} onChange={e => setPolicy(e.target.value as PowerPolicy)}><option value="equity">Equity · proportional to demand</option><option value="directorate">Directorate · upper levels first</option></select></label>
           {fields.map(([key, title, detail]) => <label key={key} className="budget-row"><span><strong>{title}</strong><small>{detail}</small></span>
             <select aria-label={title} value={draft[key]} onChange={e => setDraft({...draft, [key]: Number(e.target.value)})}>{Array.from({length:11}, (_, i) => <option key={i}>{i * 10}</option>)}</select></label>)}

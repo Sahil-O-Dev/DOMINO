@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { PanelExplain } from "../PanelExplain";
+import { floorReading, budgetReading, exposureReading, deepReading } from "../../lib/simulation/readings";
 import { AdvisorBriefing } from "./AdvisorBriefing";
 import { Trajectories } from "./Trajectories";
 import { Activity, RotateCcw } from "lucide-react";
@@ -79,6 +81,8 @@ export function Dashboard() {
   const reduction =
     untreatedHarm.totalUnsafePersonHours -
     winner.outcome.simulation.harm.totalUnsafePersonHours;
+  const counterpart = outcomes.find(o => o.policy !== policy && sameAllocation(o.allocation, winner.outcome.allocation))!;
+  const unsafeFloors = current.levels.filter(level => isUnsafe(level.hazards)).map(level => level.levelId);
   const apply = (plan: ResourceAllocation) => {
     setAllocation(plan);
     setDraft(plan);
@@ -166,20 +170,24 @@ export function Dashboard() {
         <article>
           <span>Unsafe residents · hour {hour}</span>
           <strong>{format(current.unsafePopulation)}</strong>
+          <PanelExplain title="unsafe residents" reading={`At hour ${hour}, ${format(current.unsafePopulation)} residents live on floors with at least one unsafe reading. ${unsafeFloors.length ? 'Affected levels: ' + unsafeFloors.join(', ') + '.' : 'Every floor meets the modeled thresholds at this hour.'}`}/>
         </article>
         <article>
           <span>Unsafe person-hours · full 72 hours</span>
           <strong>{format(harm.totalUnsafePersonHours)}</strong>
+          <PanelExplain title="total exposure" reading={exposureReading(harm.totalUnsafePersonHours)}/>
         </article>
         <article>
           <span>Deep unsafe hours per resident · full 72 hours</span>
           <strong>{format(harm.deepUnsafeHoursPerCapita)}</strong>
+          <PanelExplain title="deep-level exposure" reading={deepReading(harm.deepUnsafeHoursPerCapita)}/>
         </article>
         <article>
           <span>Available power · hour {hour}</span>
           <strong>
             {format(current.availablePower)} <small>/ 120</small>
           </strong>
+          <PanelExplain title="available power" reading={`At hour ${hour}, ${format(current.availablePower)} of the district’s ${MODEL.normalPower} essential power units are available. That covers ${format(100 * current.availablePower / MODEL.normalPower)}% of district demand before allocation across the five levels.`}/>
         </article>
       </section>
       <div className="workspace">
@@ -216,6 +224,7 @@ export function Dashboard() {
                   .filter(Boolean)
                   .join(" · ") || "All modeled thresholds satisfied"}
               </p>
+              <PanelExplain title={'level ' + level.levelId} reading={floorReading(level, hour)}/>
             </article>
           ))}
           <p className="footnote">
@@ -229,6 +238,7 @@ export function Dashboard() {
         <section className="panel" id="planner">
           <p className="eyebrow">Emergency resources</p>
           <h2>Allocate 100 credits</h2>
+          <PanelExplain title="allocation draft" reading={budgetReading(draft)}/>
           <p className="muted">
             Ventilation improves cooling. Repairs begin at hour 25.
             Redistribution moves existing electricity.
@@ -295,6 +305,7 @@ export function Dashboard() {
         <section className="panel">
           <p className="eyebrow">Fairness ranking · {ranked.length} plans</p>
           <h2>Ranked response plans</h2>
+          <PanelExplain title="ranked plans" reading={`At fairness weight ${format(lambda)} under ${policy}, ${lowestScoreCount} of ${ranked.length} allocations reach the minimum score of ${format(winner.score)}. The first listed assigns ${planLabel(winner.outcome.allocation)} credits to ventilation, repairs and redistribution. Lower scores favor less total exposure, with extra weight on deep levels as the fairness setting rises.`}/>
           <label>
             Deep-level fairness weight: <strong>{lambda.toFixed(1)}</strong>
             <input
@@ -375,6 +386,7 @@ export function Dashboard() {
       <section className="panel" id="comparison">
         <p className="eyebrow">Same disaster · same 100-credit budget</p>
         <h2>Policy comparison</h2>
+        <PanelExplain title="policy comparison" reading={`Keeping the leading ${policy} allocation fixed at ${planLabel(winner.outcome.allocation)}, the 72-hour outage produces ${format(winner.outcome.simulation.harm.totalUnsafePersonHours)} unsafe person-hours under ${policy} and ${format(counterpart.simulation.harm.totalUnsafePersonHours)} under ${counterpart.policy}. Holding spending fixed isolates the effect of power priorities.`}/>
         <p className="muted">
           Each row holds the allocation fixed across policies. Policy-specific
           winners can use different plans.
@@ -485,10 +497,12 @@ export function Dashboard() {
               <article>
                 <span>Before · untreated unsafe person-hours</span>
                 <strong>{format(untreatedHarm.totalUnsafePersonHours)}</strong>
+                <PanelExplain title="untreated exposure" reading={'Without intervention: ' + exposureReading(untreatedHarm.totalUnsafePersonHours)}/>
               </article>
               <article>
                 <span>After · selected plan unsafe person-hours</span>
                 <strong>{format(harm.totalUnsafePersonHours)}</strong>
+                <PanelExplain title="selected plan exposure" reading={'With the applied plan: ' + exposureReading(harm.totalUnsafePersonHours)}/>
               </article>
               <article>
                 <span>Change in unsafe person-hours</span>
@@ -498,6 +512,7 @@ export function Dashboard() {
                       untreatedHarm.totalUnsafePersonHours,
                   )}
                 </strong>
+                <PanelExplain title="change in exposure" reading={`Compared with the untreated outage, the applied plan changes total exposure from ${format(untreatedHarm.totalUnsafePersonHours)} to ${format(harm.totalUnsafePersonHours)} unsafe resident-hours. A lower total means residents collectively spend fewer hours on unsafe floors.`}/>
               </article>
               <article>
                 <span>Deep-level hours per resident · before → after</span>
@@ -505,6 +520,7 @@ export function Dashboard() {
                   {format(untreatedHarm.deepUnsafeHoursPerCapita)} →{" "}
                   {format(harm.deepUnsafeHoursPerCapita)}
                 </strong>
+                <PanelExplain title="change on deep levels" reading={`Residents of levels 4 and 5 average ${format(untreatedHarm.deepUnsafeHoursPerCapita)} unsafe hours without intervention and ${format(harm.deepUnsafeHoursPerCapita)} with this plan over the same 72 hours.`}/>
               </article>
             </div>
             <p className="footnote">

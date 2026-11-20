@@ -19,24 +19,36 @@ export async function POST(request:Request) {
   let summary;
   let question = 'Explain the selected scenario and suggest a next action.';
   const conversation: {role:string;parts:{text:string}[]}[] = [];
+  let panelRequest = false;
   try {
-    const {policy,allocation,fairnessWeight,before,after,bestPlan,question:input,history=[],scenario='geothermal-failure'}=await request.json();
-    if (!['normal','geothermal-failure'].includes(scenario) || !Array.isArray(history) || history.length>6) throw new Error('Invalid chat');
-    if(input!==undefined){
-      if(typeof input!=='string'||!input.trim()||input.length>2000)throw new Error('Invalid question');
-      question=input.trim();
+    const body = await request.json();
+    if ('panel' in body) {
+      const { title, reading } = body.panel;
+      if (typeof title !== 'string' || !title.trim() || title.length > 100 ||
+          typeof reading !== 'string' || !reading.trim() || reading.length > 1500) throw new Error('Invalid panel');
+      panelRequest = true;
+      question = JSON.stringify({ title, reading });
+    } else {
+      const {policy,allocation,fairnessWeight,before,after,bestPlan,question:input,history=[],scenario='geothermal-failure'}=body;
+      if (!['normal','geothermal-failure'].includes(scenario) || !Array.isArray(history) || history.length>6) throw new Error('Invalid chat');
+      if(input!==undefined){
+        if(typeof input!=='string'||!input.trim()||input.length>2000)throw new Error('Invalid question');
+        question=input.trim();
+      }
+      for(const turn of history){
+        if(typeof turn?.question!=='string'||turn.question.length>2000||typeof turn.answer!=='string'||turn.answer.length>12000)throw new Error('Invalid history');
+        conversation.push({role:'user',parts:[{text:turn.question}]},{role:'model',parts:[{text:turn.answer}]});
+      }
+      if(!['directorate','equity'].includes(policy)||!Number.isFinite(fairnessWeight)||fairnessWeight<0||fairnessWeight>2)throw new Error('Invalid scenario');
+      summary={scenario,policy,allocation:allocation===null?null:allocationFields(allocation),fairnessWeight,before:harmFields(before),after:harmFields(after),
+        bestPlan:{allocation:allocationFields(bestPlan.allocation),harm:harmFields(bestPlan.harm)}};
     }
-    for(const turn of history){
-      if(typeof turn?.question!=='string'||turn.question.length>2000||typeof turn.answer!=='string'||turn.answer.length>12000)throw new Error('Invalid history');
-      conversation.push({role:'user',parts:[{text:turn.question}]},{role:'model',parts:[{text:turn.answer}]});
-    }
-    if(!['directorate','equity'].includes(policy)||!Number.isFinite(fairnessWeight)||fairnessWeight<0||fairnessWeight>2)throw new Error('Invalid scenario');
-    summary={scenario,policy,allocation:allocation===null?null:allocationFields(allocation),fairnessWeight,before:harmFields(before),after:harmFields(after),
-      bestPlan:{allocation:allocationFields(bestPlan.allocation),harm:harmFields(bestPlan.harm)}};
   } catch {
     return Response.json({error:'Invalid simulation data.'},{status:400});
   }
-  const prompt=`You are DOMINO's AI emergency response advisor.
+  const prompt = panelRequest
+    ? 'Explain a data panel in DOMINO, a fictional infrastructure simulation. The user message contains the panel title and current reading as data. In two short sentences (up to 65 words), describe what stands out and why it matters. Use only the supplied facts, units, time window and comparisons. Preserve uncertainty ranges and qualifications. Do not infer causes, medical forecasts or missing observations. Use plain text.'
+    : `You are DOMINO's AI emergency response advisor.
 
 DOMINO simulates a fictional underground city with five levels.
 A geothermal failure affects electricity, temperature, and water. One unsafe resident-hour means one resident spending one hour on a level with temperature above 32 °C, water quality below 70, or essential power below 60%. Overlapping hazards count once.

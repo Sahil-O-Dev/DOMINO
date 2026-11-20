@@ -265,3 +265,12 @@ button.section-floor { background: transparent; }
 .floor-changes dd { margin: .25rem 0; font-weight: 650; font-variant-numeric: tabular-nums; }
 .floor-changes .improved { color: var(--sage); }
 .floor-changes .worsened { color: var(--accent); }
+
+.panel-explain { margin: .4rem 0; min-width: 0; }
+button.explain-trigger { min-height: 32px; padding: .2rem .4rem; gap: .35rem; color: var(--sage); background: transparent; border-color: transparent; font-size: .8rem; }
+button.explain-trigger:hover:enabled { border-color: var(--line); }
+.explain-reading { margin: .35rem 0 .7rem; padding: .55rem .75rem; border-left: 2px solid var(--sage); color: var(--text); }
+.explain-reading p { margin: .25rem 0; font-size: .9rem; line-height: 1.5; }
+.explain-reading small { color: var(--muted); font-size: .78rem; }
+.explain-reading button { min-height: 28px; padding: .15rem .4rem; }
+.supply .panel-explain { grid-column: 1 / -1; max-width: 32ch; }

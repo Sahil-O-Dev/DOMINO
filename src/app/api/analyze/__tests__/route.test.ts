@@ -38,3 +38,19 @@ it('distinguishes provider quota errors from timeouts',async()=>{
   vi.stubGlobal('fetch',vi.fn().mockRejectedValue(new DOMException('Timed out','TimeoutError')));
   expect((await POST(request())).status).toBe(504);
 });
+
+it('grounds a panel explanation in only the selected reading and rejects empty readings', async () => {
+  user.mockResolvedValue({ name: 'Tester' });
+  vi.stubEnv('GEMINI_API_KEY', 'test-only');
+  const provider = vi.fn().mockResolvedValue(Response.json({candidates:[{content:{parts:[{text:'Brief reading.'}]}}]}));
+  vi.stubGlobal('fetch', provider);
+  const panel = { title: 'Available power', reading: 'At hour 1, 84 of 120 power units are available.' };
+  const post = (reading: string) => POST(new Request('http://localhost/api/analyze', {
+    method: 'POST', body: JSON.stringify({panel: {...panel, reading}, history:[{question:'Unrelated',answer:'Earlier answer'}]}),
+  }));
+  expect((await post(' ')).status).toBe(400);
+  expect(provider).not.toHaveBeenCalled();
+  expect(await (await post(panel.reading)).json()).toEqual({explanation:'Brief reading.'});
+  const {contents} = JSON.parse(provider.mock.calls[0]![1].body);
+  expect(contents).toEqual([{role:'user',parts:[{text:JSON.stringify(panel)}]}]);
+});

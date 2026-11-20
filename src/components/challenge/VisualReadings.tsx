@@ -1,3 +1,5 @@
+import { PanelExplain } from '../PanelExplain';
+import { exposureReading } from '../../lib/simulation/readings';
 import { useMemo } from 'react';
 import { calculateHarm } from '../../lib/simulation/metrics';
 import { LEVELS, MODEL, isUnsafe } from '../../lib/simulation/simulation';
@@ -17,6 +19,7 @@ export function FloorLight({ level, clip = 100 }: {level: LevelSnapshot; clip?: 
 export function SafetyGrid({ series, hour, inspect }: {series: readonly HourlySnapshot[]; hour: number; inspect: (id: LevelId, hour: number) => void}) {
   const harm = useMemo(() => calculateHarm(series), [series]);
   return <section className="visual-panel"><h3>District exposure</h3><p>Hours 1–{MODEL.hours} · hatching marks unsafe hours. Select a strip to inspect a level and hour.</p>
+    <PanelExplain title="district exposure strips" reading={exposureReading(harm.totalUnsafePersonHours) + ' Unsafe hours on levels 1 through 5: ' + harm.levels.map(l => l.unsafeHours).join(', ') + '.'}/>
     {harm.levels.map((level, i) => <div className="exposure-row" key={level.levelId}>
       <span>L{level.levelId}</span>
       <button className="safety-strip" aria-label={'Inspect level ' + level.levelId + ' at hour ' + Math.max(1,hour)} onClick={e => {

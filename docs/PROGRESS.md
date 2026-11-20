@@ -16,6 +16,8 @@ Verification: all 36 existing tests passed in 5 files; Next.js production build 
 
 ## Current snapshot
 
+- Added inline Explain buttons to data panels in the control room, guest challenge, replay, and Handoff. Readings follow current panel values. Guests receive local readings, and the signed-in advisor can interpret a panel on demand. All 59 tests, strict type checking, and the production build passed. Chrome verified the guest view at 375 px, signed-in interactions with mocked AI, switching readings, reopening, fallback and retry, and isolation of the official feed. Project owner to review the demo experience.
+
 - Replaced the advisor chat box with a single briefing button. Before a plan is applied it explains the scenario. Afterward it analyzes the applied plan. All 56 tests, strict type checking, and the production build passed. A signed-in Chrome check with mocked advisor responses verified both actions and clearing the previous briefing when the applied plan changes. Ready for project owner review.
 
 - The challenge debrief now compares each revision with the preceding submission in the same visit. Chrome at 1280 and 375 px verified three successive submissions, signed safe-hour changes across the five floors, and replay opening at the first changed safety status. In the Directorate run, shifting 10 credits from repairs to redistribution gained 59 safe hours on level 5 and cost level 3 five hours. All 56 tests, strict type checking, and the production build passed. Project owner to review the guest retry flow.

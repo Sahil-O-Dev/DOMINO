@@ -1,3 +1,4 @@
+import { PanelExplain } from '../PanelExplain';
 import { compareAttempts } from '../../lib/simulation/compare-attempts';
 import { MODEL } from '../../lib/simulation/simulation';
 import type { LevelId, PlanOutcome } from '../../lib/simulation/types';
@@ -27,6 +28,7 @@ export function AttemptComparison({ previous, current, target }: {
     <p>{firstDifference
       ? `The first safety difference appears on level ${firstDifference.levelId} at hour ${firstDifference.hour}.`
       : 'Both responses have the same hour-by-hour safety status on all five levels.'}</p>
+    <PanelExplain title="response revision" reading={`From the previous submission to the current one, safe hours on levels 1 through 5 changed by ${levels.map(l => l.safeHoursGained).join(', ')} respectively. District exposure changed by ${exposureChange.toLocaleString('en-US')} unsafe resident-hours because the district total weights each floor by population.`}/>
     <details className="level-details">
       <summary>Replay both responses</summary>
       <p className="footnote">Credits for ventilation / repairs / redistribution<br/>

@@ -1,5 +1,7 @@
 'use client';
 
+import { PanelExplain } from '../PanelExplain';
+import { floorReading } from '../../lib/simulation/readings';
 import { IllustrativeLayer } from './IllustrativeLayer';
 import { ZERO_ALLOCATION } from '../../lib/simulation/interventions';
 import { Cascade } from './Cascade';
@@ -100,6 +102,8 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
       <aside className="section-inspector">
         <p className="eyebrow">{funded ? comparison ? 'Untreated comparison' : 'Funded response' : 'Untreated scenario'} · Hour {hour}</p>
         <h2>Level {floor}</h2><p>{isUnsafe(reading.hazards) ? 'Residents here are exposed to unsafe conditions.' : 'Power, temperature and water are within safe limits here.'}</p>
+        <PanelExplain title={'level ' + floor + ' conditions'} onOpen={() => setPlaying(false)}
+          reading={(funded && !comparison ? 'Funded response. ' : 'Untreated run. ') + floorReading(reading, hour)}/>
         <details className="level-details"><summary>View floor readings</summary>
         <p>{format(LEVELS[floor - 1]!.population)} residents</p><strong className={isUnsafe(reading.hazards) ? 'warning-text' : ''}>{isUnsafe(reading.hazards) ? 'Unsafe · ' + warnings(reading) : 'Within modeled limits'}</strong>
         <dl>{[
@@ -129,7 +133,8 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
         {playing ? 'Pause' : hour === 0 ? 'Trigger failure' : hour === MODEL.hours ? 'Replay' : 'Resume'}</button>
       <label>Hour {hour} / {MODEL.hours}<input type="range" aria-label="District replay hour" min={0} max={MODEL.hours} value={hour} onChange={e => seek(Number(e.target.value))}/></label>
       <button aria-label="Skip to final hour" onClick={() => seek(MODEL.hours)}><SkipForward size={16}/></button>
-      <div className="supply"><span>District supply</span><strong>{current.availablePower} / {MODEL.normalPower}</strong><meter min={0} max={MODEL.normalPower} value={current.availablePower} aria-label="Available district power"/></div>
+      <div className="supply"><span>District supply</span><strong>{current.availablePower} / {MODEL.normalPower}</strong><meter min={0} max={MODEL.normalPower} value={current.availablePower} aria-label="Available district power"/>
+        <PanelExplain title="district supply" onOpen={() => setPlaying(false)} reading={`At hour ${hour}, the district can supply ${current.availablePower} of the ${MODEL.normalPower} units residents need. Redistributing power changes which floors receive it.`}/></div>
     </div>
     <p className="section-caption" role="status">{atThreshold
       ? 'First unsafe hour · Level ' + first.levelId + ' · ' + warnings(first) + (firstLevels && firstLevels.length > 1 ? '. Also unsafe: ' + firstLevels.slice(1).map(l => 'Level ' + l.levelId).join(', ') : '')
