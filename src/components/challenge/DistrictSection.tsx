@@ -67,6 +67,7 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
       <div><p className="eyebrow">DOMINO / District section</p><h1>The Hollow</h1></div>
       <div className="actions"><Link className="text-link" href="/brief">Scenario brief</Link><Link className="outline-link" href="/domino">Inspect data ↗</Link></div>
     </div>
+    {!funded && <p className="scene-prompt">A power outage is about to hit this underground city. Trigger the failure to see which floor needs help first.</p>}
     <div className="section-stage">
       <div className="section-plate" role="group" aria-label="Select a district floor">
         {current.levels.map(level => {
@@ -78,9 +79,9 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
             <FloorLight level={level}/>
             {funded && !comparison && split > 0 && <span className="split-layer" style={{clipPath: 'inset(0 ' + (100 - split) + '% 0 0)'}}><FloorLight level={untreated[hour]!.levels[level.levelId - 1]!}/></span>}
             {funded && !comparison && split > 0 && <i className="split-line" style={{left: split + '%'}}/>}
-            <span className="floor-id">L0{level.levelId}</span>
+            <span className="floor-id">Level {level.levelId}</span>
             {funded && !comparison && split>0 && <span className="left-safety">Untreated · {isUnsafe(untreated[hour]!.levels[level.levelId-1]!.hazards) ? '△ Unsafe' : 'Safe'}</span>}
-            {unsafe && !(funded && !comparison && split===100) && <span className="floor-alert">△ Unsafe</span>}
+            {!(funded && !comparison && split===100) && <span className={unsafe ? 'floor-alert' : 'floor-safe'}>{unsafe ? '△ ' + [level.hazards.heat && 'Excess heat', level.hazards.water && 'Poor water quality', level.hazards.power && 'Low power'].filter(Boolean).join(' · ') : '✓ Safe'}</span>}
           </button>;
         })}
         {funded && !comparison && <button type="button" className="split-grip" role="slider" aria-label="Drag cutaway comparison" aria-valuemin={0} aria-valuemax={100} aria-valuenow={split}
@@ -98,15 +99,16 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
       </div>
       <aside className="section-inspector">
         <p className="eyebrow">{funded ? comparison ? 'Untreated comparison' : 'Funded response' : 'Untreated scenario'} · Hour {hour}</p>
-        <h2>Level {floor}</h2><p>{format(LEVELS[floor - 1]!.population)} residents</p>
-        <strong className={isUnsafe(reading.hazards) ? 'warning-text' : ''}>{isUnsafe(reading.hazards) ? 'Unsafe · ' + warnings(reading) : 'Within modeled limits'}</strong>
+        <h2>Level {floor}</h2><p>{isUnsafe(reading.hazards) ? 'Residents here are exposed to unsafe conditions.' : 'Power, temperature and water are within safe limits here.'}</p>
+        <details className="level-details"><summary>View floor readings</summary>
+        <p>{format(LEVELS[floor - 1]!.population)} residents</p><strong className={isUnsafe(reading.hazards) ? 'warning-text' : ''}>{isUnsafe(reading.hazards) ? 'Unsafe · ' + warnings(reading) : 'Within modeled limits'}</strong>
         <dl>{[
           ['Essential power', format(reading.powerFraction * 100) + '%'],
           ['Temperature', format(reading.temperatureCelsius) + ' °C'],
           ['Water quality', format(reading.waterQuality) + ' / 100'],
-        ].map(([name, value]) => <div key={name}><dt>{name}</dt><dd>{value}</dd></div>)}</dl>
-        {represent && <a className="outline-link" href="#fund-response" onClick={() => represent(floor)}>Represent level {floor} ↓</a>}
-        {funded && <div className="compare-controls">
+        ].map(([name, value]) => <div key={name}><dt>{name}</dt><dd>{value}</dd></div>)}</dl></details>
+        {represent && <a className="outline-link" href="#fund-response" onClick={() => represent(floor)}>Plan a response for level {floor} ↓</a>}
+        {funded && <details className="level-details"><summary>Compare with no intervention</summary><div className="compare-controls">
           <button type="button" disabled={pinned} onPointerDown={e => {
             if (e.button !== 0) return;
             e.currentTarget.setPointerCapture(e.pointerId); setPlaying(false); setHolding(true);
@@ -116,7 +118,7 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
             onKeyUp={() => setHolding(false)}>Hold to compare</button>
           <label>Untreated on left · {split}%<input type="range" aria-label="Before and after split" min="0" max="100" value={split} disabled={comparison} onChange={e => {setPlaying(false); setSplit(Number(e.target.value));}}/></label>
           <label><input type="checkbox" checked={pinned} onChange={e => { setPlaying(false); setPinned(e.target.checked); }}/> Show untreated</label>
-        </div>}
+        </div></details>}
       </aside>
     </div>
     <div className="exhibit-transport">
@@ -133,9 +135,11 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
       ? 'First unsafe hour · Level ' + first.levelId + ' · ' + warnings(first) + (firstLevels && firstLevels.length > 1 ? '. Also unsafe: ' + firstLevels.slice(1).map(l => 'Level ' + l.levelId).join(', ') : '')
       : hour === 0 ? 'Before the outage. Select a floor to inspect it, or trigger the failure to watch the district respond.'
       : hour === MODEL.hours ? 'Replay complete. Scrub the timeline to inspect any hour.' : 'Geothermal outage in progress.'}</p>
+    <details className="investigate"><summary>Explore the data behind the replay</summary>
     <p className="footnote">Warm upper tint shows warming above baseline. Blue lower tint shows water quality loss. Dimming and subtle flicker track the unmet share of essential power.</p>
     <SafetyGrid series={series} hour={hour} inspect={(id,h) => {setFloor(id); seek(h);}}/>
     <Cascade series={series} untreated={untreated} funded={funded} hour={hour} floor={floor} playing={playing} seek={seek}/>
     <IllustrativeLayer policy={policy} allocation={comparison ? ZERO_ALLOCATION : allocation} series={series} floor={floor} hour={hour} inspect={(id,h)=>{setFloor(id);seek(h);}}/>
+    </details>
   </section>;
 }

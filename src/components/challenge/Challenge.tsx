@@ -69,16 +69,20 @@ function Debrief({ ranked, chosen, target, retry, outcomes }: {
   const exposed = simulation.harm.levels.filter(l=>l.levelId!==target && l.unsafeHours>0);
   const worsened = exposed.filter(l=>l.unsafeHours>baseline.levels[l.levelId-1]!.unsafeHours);
   const protectedHours = simulation.harm.levels[target - 1]!.unsafeHours;
+  const gain = baseline.levels[target - 1]!.unsafeHours - protectedHours;
   return <>
+    <section className="panel debrief-heading"><p className="eyebrow accent">Response debrief · {policy}</p>
+      <h2>{protectedHours === 0 ? 'Level '+target+' stayed safe for all three days.' : 'Level '+target+' spent '+protectedHours+' hours in unsafe conditions.'}</h2>
+      <p>{gain > 0 ? 'Your plan gave residents here '+gain+' more safe hours than the untreated outage.' : gain < 0 ? 'Residents here lost '+(-gain)+' safe hours compared with the untreated outage.' : 'Residents here had the same number of safe hours as in the untreated outage.'}
+        {' '}{worsened.length > 0 ? 'Unsafe hours increased on '+worsened.map(l=>'level '+l.levelId).join(', ')+'.' :
+        exposed.length > 0 ? 'Elsewhere, '+exposed.map(l=>'level '+l.levelId).join(', ')+' still experienced unsafe conditions.' : 'All other levels stayed safe.'}</p>
+      <div className="actions"><button className="primary" onClick={retry}>Try another response</button><ResultCard plan={chosen} target={target}/></div>
+    </section>
     <p className="eyebrow">Replay · {explored.policy} · {allocationText(explored)}</p>
     <DistrictSection policy={explored.policy} allocation={explored.allocation} key={replayNumber} autoplay={replayNumber>0} funded={explored.simulation.snapshots} untreated={replayBaseline} target={target}/>
-    <PlanSpace player={chosen} selected={explored} outcomes={outcomes} replay={o=>{setExplored(o);setReplayNumber(n=>n+1);}}/>
-    <section className="panel debrief-heading"><p className="eyebrow accent">Response debrief · {policy}</p>
-      <h2>Level {target} review</h2><p>Your level spent <strong>{protectedHours} of {MODEL.hours} hours</strong> under unsafe conditions. Your allocation was {label(chosen.outcome.allocation)} in ventilation, repairs and redistribution.</p>
-      {protectedHours===0 && exposed.length>0 && <p>Your level stayed safe. Exposure fell on {exposed.map(l=>'level '+l.levelId+' ('+l.unsafeHours+' unsafe hours)').join(', ')}. {worsened.length ? 'Compared with untreated failure, the allocation increased unsafe hours on '+worsened.map(l=>'level '+l.levelId).join(', ')+'.' : 'Each of these levels had equal or greater exposure in the untreated failure.'}</p>}
+    <details className="investigate"><summary>Compare plans and district outcomes</summary>
       <div className="actions"><button aria-pressed={mode === 'district'} onClick={() => setMode('district')}>District impact</button>
-        <button aria-pressed={mode === 'optimizer'} onClick={() => setMode('optimizer')}>Challenge the optimizer</button><button onClick={retry}>Revise response</button><ResultCard plan={chosen} target={target}/></div>
-    </section>
+        <button aria-pressed={mode === 'optimizer'} onClick={() => setMode('optimizer')}>Challenge the optimizer</button></div>
     {mode === 'district' ? <div className="workspace"><section className="panel"><h2>Who gained safe hours?</h2>
       <p className="muted">Unsafe hours across the same failure, with and without your 100 credits.</p>
       <div className="table-wrap"><table><thead><tr><th>Level</th><th>Untreated</th><th>Your plan</th><th>Safe hours gained</th></tr></thead>
@@ -99,6 +103,8 @@ function Debrief({ ranked, chosen, target, retry, outcomes }: {
       </select></label>
       {other !== best && other.score === best.score && <p>These allocations tie. Which would you choose after inspecting heat and water quality?</p>}
     </section><section className="panel"><h2>Compare conditions</h2><Replay a={other.outcome.simulation.snapshots} b={best.outcome.simulation.snapshots} target={target} names={[alternative === 'yours' ? 'Your plan' : 'Tied plan', 'Optimizer pick']}/></section></div>}
+    <PlanSpace player={chosen} selected={explored} outcomes={outcomes} replay={o=>{setExplored(o);setReplayNumber(n=>n+1);}}/>
+    </details>
   </>;
 }
 
@@ -120,7 +126,7 @@ export function Challenge() {
     window.scrollTo(0, 0);
   }
   return <main id="main-content" className="shell challenge">
-    {chosen && target ? <Debrief outcomes={cache.getOutcomes()} ranked={ranked} chosen={chosen} target={target} retry={() => setChosen(null)}/> : <>
+    {chosen && target ? <Debrief outcomes={cache.getOutcomes()} ranked={ranked} chosen={chosen} target={target} retry={() => {setChosen(null);requestAnimationFrame(()=>document.getElementById('fund-response')?.scrollIntoView());}}/> : <>
       <DistrictSection policy={policy} key={policy} untreated={untreated} target={target} represent={setTarget}/>
       <section className="panel funding" id="fund-response"><h2>Fund your response</h2>
           <p>Allocate 100 emergency credits for the district. {target ? 'You represent level ' + target + '.' : 'Choose the floor you represent in the section above.'}</p>
@@ -128,7 +134,7 @@ export function Challenge() {
           {fields.map(([key, title, detail]) => <label key={key} className="budget-row"><span><strong>{title}</strong><small>{detail}</small></span>
             <select aria-label={title} value={draft[key]} onChange={e => setDraft({...draft, [key]: Number(e.target.value)})}>{Array.from({length:11}, (_, i) => <option key={i}>{i * 10}</option>)}</select></label>)}
           <p role="status">{total} / 100 credits · {!target ? 'Choose a level to represent.' : total !== 100 ? 'Allocate exactly 100 to continue.' : 'Ready to commit for level ' + target + '.'}</p>
-          {preview && <p className="preview-result">72-hour draft preview · <strong>{number(preview.simulation.harm.totalUnsafePersonHours)} unsafe resident-hours</strong> · Safe-hours Gini {safeHoursGini(preview.simulation.harm)?.toFixed(3) ?? 'undefined'}. Zero indicates equal safe hours across residents.</p>}
+          {preview && <details className="level-details"><summary>Preview this allocation</summary><p className="preview-result">72-hour draft preview · <strong>{number(preview.simulation.harm.totalUnsafePersonHours)} unsafe resident-hours</strong> · Safe-hours Gini {safeHoursGini(preview.simulation.harm)?.toFixed(3) ?? 'undefined'}. Zero indicates equal safe hours across residents.</p></details>}
           <button className="primary" disabled={!target || total !== 100} onClick={commit}>Commit response <ArrowRight size={16}/></button></section></>}
   </main>;
 }
