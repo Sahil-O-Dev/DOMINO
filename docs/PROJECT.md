@@ -70,6 +70,10 @@ Use Node 22.14.0 and npm 11.3.0 as the team baseline, with a committed npm lockf
 
 `metrics.ts` calculates per-level and district harm from the union of hazard flags, excludes hour 0, and validates timeline sequence/level order. `ranking.ts` converts cached trajectories into frozen PlanOutcome records once; ranking uses those records without recomputing physics. `comparePolicies` explicitly returns same-plan and independently optimized results. Scores retain full precision. The proposed ascending V/R/X exact-tie convention is implemented for review, not claimed as a substantive improvement among tied plans.
 
+### The Handoff
+
+The optional field-operations mode presents a fixed Level 5 briefing from the untreated Directorate trajectory. Its rounded hour-1 official sample and current hour-12 resident reports are separate views of the same run. Players assess each threshold and select a budget. The reveal compares that assessment with the actual state, then evaluates a full-horizon counterfactual from hour 1. Solo resident dispatches use deterministic templates. Hot-seat uses a covered pass screen. Paired rooms synchronize reports and the committed decision on one Node process, expire after 30 minutes and end if the server restarts. Simulations still run on the client.
+
 ### Stage 5 dashboard
 
 The challenge renders per-hour physical overlays, an interactive exposure matrix, before/after split, modeled dependency and power-flow diagrams, selectable optimizer scatter and local PNG results. Population-weighted safe-hours Gini is a presentation metric independent of ranking. The optional 500-run ensemble uses a local seed and a sampled trajectory entry point that shares the baseline recurrence. It runs only when enabled. Results are summarized per level/hour and per pathway; baseline scores and replay use the deterministic cache. See SPEC for sampling and proxy definitions.

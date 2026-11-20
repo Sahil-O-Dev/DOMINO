@@ -16,6 +16,8 @@ Verification: all 36 existing tests passed in 5 files; Next.js production build 
 
 ## Current snapshot
 
+- Added The Handoff as a separate guest mode at `/handoff`, linked from the district opener. Solo and hot-seat briefings work on one device. Paired mode uses a six-character code. Local Chrome checks covered report delivery between separate browser contexts, resident refresh, hot-seat privacy, identical debriefs and 375 px layout. All 47 tests, strict type checking and production build passed. Project owner to rehearse on the venue network with a physical phone or use hot-seat. Windows verification remains with the teammate.
+
 - Fixed the opaque floor buttons that covered four floors of the cutaway. The guest flow now labels every floor’s safety, offers readings and charts on demand, and leads the debrief with the represented level’s outcome relative to the untreated outage. Chrome verified selecting all five floors at both 1280 px and 375 px, the first hazard, plan commitment, opening analyses and revising a plan. All 45 tests, strict type checking and production build passed. Project owner to review the simplified Stage 5 flow.
 
 - Implemented visual diagnostics, 66-plan scatter/replay for either policy, live budget/equity preview, and the approved illustrative uncertainty and health layer. The local production build, strict type check and 45 Vitest tests in 9 files passed. The original 40 checks are intact. Additional tests cover weighted Gini, reproducibility, zero/monotone risk, illustrative calibration and baseline coverage of the untreated Equity level-5 endpoint. Coverage at other points is empirical.

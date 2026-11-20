@@ -65,7 +65,7 @@ export function DistrictSection({ untreated, funded, target, represent, policy, 
   return <section className="exhibit" aria-label="Interactive district section">
     <div className="exhibit-heading">
       <div><p className="eyebrow">DOMINO / District section</p><h1>The Hollow</h1></div>
-      <div className="actions"><Link className="text-link" href="/brief">Scenario brief</Link><Link className="outline-link" href="/domino">Inspect data ↗</Link></div>
+      <div className="actions"><Link className="primary" href="/handoff">Start The Handoff</Link><Link className="text-link" href="/brief">Scenario brief</Link><Link className="outline-link" href="/domino">Inspect data ↗</Link></div>
     </div>
     {!funded && <p className="scene-prompt">A power outage is about to hit this underground city. Trigger the failure to see which floor needs help first.</p>}
     <div className="section-stage">

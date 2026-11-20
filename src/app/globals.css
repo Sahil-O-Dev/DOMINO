@@ -245,3 +245,15 @@ button.section-floor { background: transparent; }
 .level-details summary,.investigate summary { cursor:pointer; color:var(--muted); padding:8px 0; font-size:.9rem; }
 .investigate { border-top:1px solid var(--line); }
 .debrief-heading { margin-top:20px; }
+.handoff { padding-block: 24px 44px; }
+.handoff > header { padding:clamp(24px,5vw,60px); margin-bottom:20px; border-radius:8px; background:linear-gradient(90deg,#101914fa,#101914ad),url('/the-hollow.webp') center/cover; }
+.handoff > header p,.handoff .panel > p {max-width:67ch;line-height:1.6;}
+.handoff h3 { margin-block:22px 10px; }
+.join-form,.room-strip,.field-line { margin-block:16px; }
+.join-form,.field-line {display:flex;align-items:end;gap:12px;flex-wrap:wrap;}
+.join-form input {display:block;padding:10px;max-width:100%;}
+.dispatch-feed {display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;}
+.dispatch-feed label {display:grid;gap:8px;border:1px solid var(--line);padding:14px;border-radius:5px;}
+.dispatch-feed strong {font-size:1.5rem;}
+.field-line {align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:10px;}
+.field-window { height:clamp(85px,12vw,150px);margin-bottom:18px;border:1px solid var(--line);border-radius:4px;background:#1c211b url('/district-section.webp') center bottom / 100% 500% no-repeat; }

@@ -78,3 +78,7 @@ docs/                           Specification, plan, decisions and progress
 Start frontend work in `src/components/dashboard/`; start model work in `src/lib/simulation/`. Keep routes in `src/app/` thin. Add tests in the corresponding `__tests__/` folder; Vitest discovers them automatically. See [the documentation index](docs/README.md) for planning files.
 
 Root files such as `package.json`, its lockfile, `tsconfig.json`, `vitest.config.ts`, and `next-env.d.ts` are tooling configuration. Keep them at the root. `.next/`, `node_modules/`, `dist/`, and TypeScript build caches are generated and ignored by Git; VS Code workspace settings hide them from the explorer. They remain on disk and can be shown by changing `.vscode/settings.json`.
+
+## The Handoff
+
+Open `/handoff` for the Level 5 operator/resident briefing. Solo and hot-seat modes need one browser. For a paired briefing, both devices must reach the same Node server. Open a room as operator, then open the same site's `/handoff` page on the resident's device and enter the six-character code. On a LAN, use the server's reachable LAN address on the phone. Rooms live for 30 minutes in server memory. A server restart clears them. If venue Wi-Fi isolates devices, use hot-seat on the laptop.
